@@ -8,6 +8,7 @@
 #include "..\funcs\allfunc.h"
 using std::cout;
 using std::ceil;
+using std::floor;
 
 class Objects
 {

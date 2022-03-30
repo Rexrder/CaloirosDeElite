@@ -3,6 +3,7 @@
 
 int main()
 {
+    FreeConsole();
     bool end = false;
     al_init();
     al_init_image_addon();
@@ -38,6 +39,7 @@ int main()
             }
             else
             {
+                end = new_game.collisionHandler();
                 new_game.moveEntities();
                 redraw = true;
             }
@@ -59,8 +61,6 @@ int main()
 
         new_game.playerMovement(event);
 
-        new_game.collisionHandler();
-
         if (redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -70,6 +70,7 @@ int main()
             redraw = false;
         }
     }
+    new_game.~Game();
 
     al_destroy_font(font);
     al_destroy_display(disp);

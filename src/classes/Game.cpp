@@ -16,17 +16,17 @@ void Game::createEnemies(int x_n, int y_n)
     {
         for (int j = 0; j < y_n; j++)
         {
-            if (j == (y_n - 1))
+            if (j < y_n/3)
             {
-                enemiesAvailable.push_back(new Enemies(-64 + -74 * i, 10 - 74 * j, 0, difficulty));
+                enemiesAvailable.push_back(new Enemies( 74 * i, -64 - 74 * j, 2, difficulty));
             }
-            else if (j > (y_n - 3))
+            else if (j < 4*y_n/5)
             {
-                enemiesAvailable.push_back(new Enemies(-64 + -74 * i, 10 - 74 * j, 1, difficulty));
+                enemiesAvailable.push_back(new Enemies( 74 * i, -64 - 74 * j, 1, difficulty));
             }
             else
             {
-                enemiesAvailable.push_back(new Enemies(-64 + -74 * i, 10 - 74 * j, 2, difficulty));
+                enemiesAvailable.push_back(new Enemies( 74 * i, -64 - 74 * j, 0, difficulty));
             }
 
             ;
@@ -34,7 +34,7 @@ void Game::createEnemies(int x_n, int y_n)
     }
 }
 
-void Game::collisionHandler()
+bool Game::collisionHandler()
 {
     bool hit = false;
     for (Bullets *n : bulletsAlly)
@@ -55,6 +55,17 @@ void Game::collisionHandler()
             bulletsAlly.remove(n);
         }
     }
+
+    for (Bullets *n : bulletsEnemies)
+    {
+        if (verifyCollision((*n).getSize(), player.getSize()))
+        {
+            (*n).~Bullets();
+            bulletsEnemies.remove(n);
+            return true;
+        };
+    }
+    return false;
 }
 
 void Game::moveEntities()
@@ -62,6 +73,11 @@ void Game::moveEntities()
     for (Bullets *n : bulletsEnemies)
     {
         (*n).move();
+        if ((*n).isAlive())
+        {
+            (*n).~Bullets();
+            bulletsEnemies.remove(n);
+        }
     }
 
     for (Bullets *n : bulletsAlly)
@@ -74,9 +90,10 @@ void Game::moveEntities()
         }
     }
 
-    if (enemiesAvailable.size() == 0){
+    if (enemiesAvailable.size() == 0)
+    {
         difficulty += 1;
-        createEnemies(10,10);
+        createEnemies(10, 10);
     }
 
     for (Enemies *n : enemiesAvailable)
@@ -116,21 +133,11 @@ void Game::drawEntities()
     for (Bullets *n : bulletsEnemies)
     {
         (*n).draw();
-        if ((*n).isAlive())
-        {
-            (*n).~Bullets();
-            bulletsEnemies.remove(n);
-        }
     }
 
     for (Bullets *n : bulletsAlly)
     {
         (*n).draw();
-        if ((*n).isAlive())
-        {
-            (*n).~Bullets();
-            bulletsAlly.remove(n);
-        }
     }
 
     for (Enemies *n : enemiesAvailable)

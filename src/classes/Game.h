@@ -7,8 +7,8 @@ private:
     std::list<Enemies*> enemiesAvailable;
     bool enem_dir;
     double difficulty;
-public:
     Player player = *new Player(518, 880);
+public:
     Game();
     ~Game();
     void createEnemies(int, int);
@@ -16,5 +16,5 @@ public:
     void moveEntities();
     void drawEntities();
     void playerMovement(ALLEGRO_EVENT event);
-    void collisionHandler();
+    bool collisionHandler();
 };
