@@ -9,10 +9,16 @@ int main()
     al_init_image_addon();
     al_install_keyboard();
 
+    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_set_path_filename(path, "/res/logo.png");
+    ALLEGRO_BITMAP *logo = al_load_bitmap(al_path_cstr(path, '/'));
+
     ALLEGRO_TIMER *timer = al_create_timer(1.0 / 30.0);
     ALLEGRO_TIMER *timer2 = al_create_timer(3.0 / 10.0);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
-    ALLEGRO_DISPLAY *disp = al_create_display(1100, 950);
+    ALLEGRO_DISPLAY *disp = al_create_display(1200, 950);
+    al_set_window_title(disp,"Caloiros De Elite");
+    al_set_display_icon(disp,logo);
     ALLEGRO_FONT *font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -22,7 +28,8 @@ int main()
 
     bool redraw = true;
     ALLEGRO_EVENT event;
-    Game new_game;
+    srand(time(0));
+    Game new_game(3);
 
     al_start_timer(timer);
     al_start_timer(timer2);

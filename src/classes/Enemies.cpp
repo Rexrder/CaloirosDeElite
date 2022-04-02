@@ -21,7 +21,7 @@ Enemies::Enemies(int xstart, int ystart, int type, double diff) : Objects(xstart
         break;
     }
     spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
-    speed = ceil(25*diff);
+    speed = 10 + ceil(10*diff);
 }
 
 Enemies::~Enemies()
@@ -42,14 +42,14 @@ void Enemies::animate(){
 
 bool Enemies::move(int n_left){
     if (moving_right){
-        x = ((ceil(speed/n_left)+2)>30) ? x + 30 : x + ceil(speed/n_left)+2;
-        if (x>1020){
+        x = ((ceil(speed/n_left))>30) ? x + 30 + ceil(speed/10): x + ceil(speed/n_left) + ceil(speed/10);
+        if (x>1120){
             return true;
         }
     }
     else{
-        x = ((ceil(speed/n_left)+2)>30) ? x - 30 : x - (ceil(speed/n_left)+2);
-        if (x<20){
+        x = ((ceil(speed/n_left))>30) ? x - (30 + ceil(speed/10)): x - (ceil(speed/n_left) + ceil(speed/10));
+        if (x<60){
             return true;
         }
     }

@@ -9,7 +9,7 @@ private:
     double difficulty;
     Player player = *new Player(518, 880);
 public:
-    Game();
+    Game(int diff, int mod);
     ~Game();
     void createEnemies(int, int);
     void animateEntities();

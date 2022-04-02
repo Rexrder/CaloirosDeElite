@@ -4,11 +4,13 @@
 #include <allegro5/allegro_windows.h>
 #include <iostream>
 #include <cmath>
+#include <ctime>
 #include <list>
 #include "..\funcs\allfunc.h"
 using std::cout;
 using std::ceil;
 using std::floor;
+using std::time;
 
 class Objects
 {

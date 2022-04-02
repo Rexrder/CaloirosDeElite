@@ -38,8 +38,8 @@ void Player::move(){
     if (movState[1]){
         x += speed;
     }
-    x = (x < 1026) ? x : x - speed;
-    x = (x > 10) ? x : x + speed;
+    x = (x < 1126) ? x : x - speed;
+    x = (x > 60) ? x : x + speed;
 }
 
 void Player::draw(){

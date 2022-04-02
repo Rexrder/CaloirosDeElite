@@ -1,8 +1,8 @@
 #include "Game.h"
 
-Game::Game()
+Game::Game(int diff = 1, int mod = 0)
 {
-    difficulty = 5.0;
+    difficulty = diff;
     enem_dir = false;
 }
 
@@ -92,7 +92,7 @@ void Game::moveEntities()
 
     if (enemiesAvailable.size() == 0)
     {
-        difficulty += 1;
+        difficulty += 0.2;
         createEnemies(10, 10);
     }
 
@@ -102,10 +102,14 @@ void Game::moveEntities()
         {
             enem_dir = true;
         }
-        if ((rand() % 200) == 0)
+        if ((rand() % (int)floor(500/difficulty)) == 0)
         {
             bulletsEnemies.push_back((*n).shoot());
         };
+        if ((*n).getSize()[1] > 1100){
+            (*n).~Enemies();
+            enemiesAvailable.remove(n);
+        }
     }
     if (enem_dir)
     {
