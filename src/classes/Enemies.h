@@ -3,8 +3,6 @@
 class Enemies: public Objects
 {
 private:
-    int anim = 0;
-    int anim_mov = 1;
     bool moving_right = true;
 public:
     Enemies(int xstart, int ystart, int type, double diff);
@@ -13,5 +11,6 @@ public:
     void draw();
     void animate();
     void changeMove();
+    void kill();
     Bullets* shoot();
 };

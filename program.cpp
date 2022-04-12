@@ -6,7 +6,10 @@ int main()
     FreeConsole();
     bool end = false;
     al_init();
+    al_init_primitives_addon();
     al_init_image_addon();
+    al_init_font_addon();
+    al_init_ttf_addon();
     al_install_keyboard();
 
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
@@ -19,7 +22,6 @@ int main()
     ALLEGRO_DISPLAY *disp = al_create_display(1200, 950);
     al_set_window_title(disp,"Caloiros De Elite");
     al_set_display_icon(disp,logo);
-    ALLEGRO_FONT *font = al_create_builtin_font();
 
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
@@ -46,7 +48,7 @@ int main()
             }
             else
             {
-                end = new_game.collisionHandler();
+                new_game.collisionHandler();
                 new_game.moveEntities();
                 redraw = true;
             }
@@ -79,7 +81,6 @@ int main()
     }
     new_game.~Game();
 
-    al_destroy_font(font);
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);

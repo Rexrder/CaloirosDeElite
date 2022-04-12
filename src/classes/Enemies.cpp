@@ -35,8 +35,12 @@ Bullets* Enemies::shoot(){
 
 void Enemies::animate(){
     anim += anim_mov;
-    if (anim != 1){
+    if (anim != 1 && anim >= 0 && anim <=2){
         anim_mov = -anim_mov;
+    }
+    if (anim >7){
+        aliveErase[1] = true;
+        anim = 7;
     }
 }
 

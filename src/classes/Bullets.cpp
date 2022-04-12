@@ -2,6 +2,7 @@
 
 Bullets::Bullets(int xstart, int ystart,bool player) : Objects(xstart, ystart)
 {
+    end = false;
     speed = -15;
     if (!player){
         speed = -speed;

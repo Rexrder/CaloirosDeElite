@@ -3,7 +3,7 @@
 class Bullets: public Objects
 {
 private:
-    bool end = false;
+    bool end;
 public:
     Bullets(int xstart, int ystart, bool player);
     ~Bullets();

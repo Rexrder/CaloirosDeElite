@@ -19,12 +19,5 @@ bool verifyCollision(int obj1[4], int obj2[4]) //function to verify collisions b
             overlap[i] = true;
         }
     }
-
-    if (overlap[0] && overlap[1]){
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+        return (overlap[0] && overlap[1]);
 };

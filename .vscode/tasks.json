@@ -2,13 +2,14 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe compilar archivo activo",
+            "label": "Testing",
             "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
             "args": [
-                "${file}",
+                "program.cpp",
                 "-o",
                 "CaloirosDeElite.exe",
                 "my.res",
+                "-Bstatic",
                 "-lallegro",
                 "-lallegro_ttf",
                 "-lallegro_font",
@@ -29,14 +30,18 @@
         },
         {
             "type": "cppbuild",
-            "label": "C/C++: gcc.exe compilar archivo activo",
-            "command": "C:\\msys64\\mingw64\\bin\\gcc.exe",
+            "label": "Release",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
             "args": [
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "-lallegro",
-                "-lallegro_font"
+                "testing.exe",
+                "my.res",
+                "-Bstatic",
+                "-lallegro_monolith",
+                "-lm",
+                "-lws2_32",
+                "-lkernel32"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -44,9 +49,12 @@
             "problemMatcher": [
                 "$gcc"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "detail": "Tarea generada por el depurador."
-        }
+        },
     ],
     "version": "2.0.0"
 }

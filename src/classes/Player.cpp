@@ -6,6 +6,7 @@ Player::Player(int xstart, int ystart) : Objects(xstart, ystart)
     al_set_path_filename(path, "/res/eletrao.png");
     spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
     speed = 15;
+    lives = 3;
 
     size[0] = 64;
     size[1] = 64;
@@ -25,9 +26,13 @@ Bullets* Player::shoot(){
     }
 
 void Player::animate(){
-    anim += anim_mov;
-    if (anim != 1){
+    anim = (anim == 3) ? 1 : anim += anim_mov;
+    if (anim == 0 || anim == 2){
         anim_mov = -anim_mov;
+    }
+    if (anim >7){
+        aliveErase[1] = true;
+        anim = 7;
     }
 }
 
