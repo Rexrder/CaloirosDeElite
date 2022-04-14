@@ -9,14 +9,34 @@
 #include <ctime>
 #include <list>
 #include "..\funcs\allfunc.h"
-using std::cout;
 using std::ceil;
+using std::cout;
 using std::floor;
 using std::time;
 
+struct Timers
+{
+    std::time_t stunned = time(NULL);
+    std::time_t invulnerable = time(NULL);
+    std::time_t slowed = time(NULL);
+    std::time_t buffed = time(NULL);
+    std::time_t hacked = time(NULL);
+};
+struct State
+{
+    bool alive = true;
+    bool erase = false;
+    bool stunned = false;
+    bool invulnerable = false;
+    bool slowed = false;
+    bool buffed = false;
+    bool hacked = false;
+    Timers timer;
+};
 class Objects
 {
 protected:
+    State state;
     int x;
     int y;
     int size[2];
@@ -24,13 +44,14 @@ protected:
     int anim = 1;
     int anim_mov = 1;
     int lives = 1;
-    bool aliveErase[2] = {true,false};
-    int posSize[4] = {x,y,size[0],size[1]};
+    int posSize[4] = {x, y, size[0], size[1]};
     ALLEGRO_BITMAP *spritesheet;
+
 public:
     Objects(int x = 0, int y = 0);
     ~Objects();
-    bool* isAlive();
-    int* getSize();
-    void shot(int);
+    State getState();
+    int *getSize();
+    virtual void shot(int = 1, int = 0);
+    void updateState();
 };

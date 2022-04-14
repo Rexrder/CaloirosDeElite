@@ -11,3 +11,6 @@ This project is a homework for first year students, from "Universidade do Minho"
 Afonso Gomes, nº aluno: A101168
 
 Christian García, nº aluno: A101170
+
+# Instructions
+A and D to move. L to shoot.

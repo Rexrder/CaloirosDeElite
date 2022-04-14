@@ -26,17 +26,24 @@ Bullets* Player::shoot(){
     }
 
 void Player::animate(){
-    anim = (anim == 3) ? 1 : anim += anim_mov;
-    if (anim == 0 || anim == 2){
-        anim_mov = -anim_mov;
+
+    if (!state.alive){
+        animation(5,7,&anim,&anim_mov,false);
+    }else
+    if (state.invulnerable){
+        animation(3,4,&anim,&anim_mov,true);
     }
-    if (anim >7){
-        aliveErase[1] = true;
-        anim = 7;
+    else{
+        animation(0,2,&anim,&anim_mov,true);
+    }
+
+    if (anim == 7){
+        state.erase = true;
     }
 }
 
 void Player::move(){
+    updateState();
     if (movState[0]){
         x -= speed;
     }
@@ -45,6 +52,14 @@ void Player::move(){
     }
     x = (x < 1126) ? x : x - speed;
     x = (x > 60) ? x : x + speed;
+}
+
+void Player::shot(int lost, int type){
+    Objects::shot(lost,type);
+    if (lives > 0){
+        state.invulnerable = true;
+        state.timer.invulnerable = time(NULL) + 3; //3 seconds of invulnerability
+    }
 }
 
 void Player::draw(){

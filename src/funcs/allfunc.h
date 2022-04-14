@@ -1,6 +1,7 @@
 bool verifyCollision(int obj1[4], int obj2[4]);
+bool animate(int start, int end, int* anim, int* anim_mov, bool ping_pong);
 
-bool verifyCollision(int obj1[4], int obj2[4]) //function to verify collisions between two entities
+bool verifyCollision(int obj1[4], int obj2[4]) //function to verify collisions between two 
 {
     bool overlap[2] = {false, false}; //vector which saves information of entities overlapping
     int dis[2] ={obj1[0] - obj2[0], obj1[1] - obj2[1]}; //vector to save distance between origin of entities
@@ -20,4 +21,30 @@ bool verifyCollision(int obj1[4], int obj2[4]) //function to verify collisions b
         }
     }
         return (overlap[0] && overlap[1]);
+};
+
+bool animation(int start, int end, int *anim, int *anim_mov, bool ping_pong){
+    bool end_cycle = false;
+
+    if (*anim < start || *anim > end){
+        *anim = start;
+        *anim_mov = 1;
+    }else{
+        if (*anim == start){
+            if (*anim_mov == -1){
+                end_cycle = true;
+            }
+            *anim_mov = 1;
+        }
+        if (*anim == end){
+            if (ping_pong){
+                *anim_mov = -1;
+            }
+            else{
+                *anim = end - 1;
+            }
+        }
+        *anim += *anim_mov;
+    }
+    return end_cycle;    
 };

@@ -20,8 +20,8 @@ int main()
     ALLEGRO_TIMER *timer2 = al_create_timer(3.0 / 10.0);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
     ALLEGRO_DISPLAY *disp = al_create_display(1200, 950);
-    al_set_window_title(disp,"Caloiros De Elite");
-    al_set_display_icon(disp,logo);
+    al_set_window_title(disp, "Caloiros De Elite");
+    al_set_display_icon(disp, logo);
 
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
@@ -31,7 +31,7 @@ int main()
     bool redraw = true;
     ALLEGRO_EVENT event;
     srand(time(0));
-    Game new_game(3);
+    Game new_game(4);
 
     al_start_timer(timer);
     al_start_timer(timer2);
@@ -49,7 +49,7 @@ int main()
             else
             {
                 new_game.collisionHandler();
-                new_game.moveEntities();
+                end = new_game.moveEntities();
                 redraw = true;
             }
             break;

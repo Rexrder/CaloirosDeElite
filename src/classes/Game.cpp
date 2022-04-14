@@ -9,6 +9,7 @@ Game::Game(int diff = 1, int mod = 0)
     enem_dir = false;
     mode = mod;
     score = 0;
+    wave = 0;
 }
 
 Game::~Game()
@@ -19,31 +20,31 @@ void Game::drawUI()
 {
     if (mode == 0)
     {
-        std::string score_str = std::to_string(score);
+        std::string score_str = "SCORE: " + std::to_string(score);
         al_draw_text(font, al_map_rgb(255, 255, 255), 1200, 25, ALLEGRO_ALIGN_RIGHT, score_str.c_str());
     }
 };
 
 void Game::createEnemies(int x_n, int y_n)
 {
+    int rand_val;
+    int enemy_app;
+
+    wave++;
+
+    if (/*wave % 5 == 0 &&*/ bossesAvailable.size() == 0)
+    {
+        bossesAvailable.push_back(new Bosses(0, difficulty));
+    }
+
     for (int i = 0; i < x_n; i++)
     {
         for (int j = 0; j < y_n; j++)
         {
-            if (j < y_n / 3)
-            {
-                enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, 2, difficulty));
-            }
-            else if (j < 4 * y_n / 5)
-            {
-                enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, 1, difficulty));
-            }
-            else
-            {
-                enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, 0, difficulty));
-            }
+            rand_val = rand();
+            enemy_app = (rand_val % 5 != 0) ? rand_val % 5 : (rand_val % 5) + 1;
 
-            ;
+            enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty));
         }
     }
 }
@@ -55,9 +56,16 @@ void Game::collisionHandler()
     {
         for (Enemies *const &m : enemiesAvailable)
         {
-            if (verifyCollision(n->getSize(), m->getSize()) && m->isAlive()[0])
+            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
-                score += ceil(10 * difficulty);
+                hit = true;
+                m->shot();
+            };
+        }
+        for (Bosses *const &m : bossesAvailable)
+        {
+            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            {
                 hit = true;
                 m->shot();
             };
@@ -72,19 +80,43 @@ void Game::collisionHandler()
 
     for (Bullets *const &n : bulletsEnemies)
     {
-        if (verifyCollision(n->getSize(), player.getSize())&& player.isAlive()[0])
+        if (verifyCollision(n->getSize(), player.getSize()) && player.getState().alive && !player.getState().invulnerable)
         {
             bulletsEnemies.remove(n);
             delete n;
             player.shot();
-            score = (score <= 50) ?  0 : score - 50;
-            difficulty = (difficulty <= 2) ?  2 : difficulty - 0.4;
+            score = (score <= 50) ? 0 : score - 50;
+            difficulty = (difficulty <= 2) ? 2 : difficulty - 0.4;
         };
+    }
+
+    for (Enemies *const &n : enemiesAvailable)
+    {
+        if (verifyCollision(n->getSize(), player.getSize()) && player.getState().alive && !player.getState().invulnerable)
+        {
+            player.shot(10);
+            score = (score <= 100) ? 0 : score - 100;
+        };
+    }
+
+    for (Bosses *const &n : bossesAvailable)
+    {
+        if (n->shootSpecial())
+        {
+            int area[4] = {n->getSize()[0], n->getSize()[1], n->getSize()[2], 1200};
+            if (verifyCollision(area, player.getSize()) && player.getState().alive && !player.getState().invulnerable)
+            {
+                player.shot(2,1);
+                score = (score <= 100) ? 0 : score - 100;
+            };
+        }
     }
 }
 
 int Game::moveEntities()
 {
+    int probability;
+
     for (Bullets *const &n : bulletsEnemies)
     {
         n->move();
@@ -117,12 +149,24 @@ int Game::moveEntities()
         {
             enem_dir = true;
         }
-        if ((rand() % (int)floor(500 / difficulty)) == 0 && n->getSize()[1] > 0)
+        if (bossesAvailable.size() == 0)
+        {
+            probability = (difficulty <= 6) ? rand() % (int)floor(600 / difficulty) : rand() % (int)floor(600 / 6);
+        }
+        else
+        {
+            probability = (difficulty <= 6) ? rand() % (int)floor(1200 / difficulty) : rand() % (int)floor(1200 / 6);
+        }
+        if (probability == 0 && n->getSize()[1] > 0)
         {
             bulletsEnemies.push_back(n->shoot());
         };
-        if (n->getSize()[1] > 1100 || n->isAlive()[1])
+        if (n->getSize()[1] > 1100 || n->getState().erase)
         {
+            if (n->getState().erase)
+            {
+                score += ceil(10 * difficulty);
+            }
             enemiesAvailable.remove(n);
             delete n;
         }
@@ -135,17 +179,39 @@ int Game::moveEntities()
         }
         enem_dir = false;
     }
-    if (player.isAlive()[0]){
+
+    for (Bosses *const &n : bossesAvailable)
+    {
+        n->move();
+        probability = (difficulty <= 6) ? rand() % (int)floor(300 / difficulty) : rand() % (int)floor(300 / 6);
+        if (probability == 0 && n->getSize()[0] > 0)
+        {
+            bulletsEnemies.push_back(n->shootNormal());
+        };
+        if (n->getState().erase)
+        {
+            score += ceil(1000 * difficulty);
+            bossesAvailable.remove(n);
+            delete n;
+        }
+    }
+
+    if (player.getState().alive)
+    {
         player.move();
     }
-    
-    return (player.isAlive()[1]);
+
+    return (player.getState().erase);
 }
 
 void Game::animateEntities()
 {
     player.animate();
     for (Enemies *const &n : enemiesAvailable)
+    {
+        n->animate();
+    }
+    for (Bosses *const &n : bossesAvailable)
     {
         n->animate();
     }
@@ -165,6 +231,11 @@ void Game::drawEntities()
         n->draw();
     }
 
+    for (Bosses *const &n : bossesAvailable)
+    {
+        n->draw();
+    }
+
     for (Bullets *const &n : bulletsAlly)
     {
         n->draw();
@@ -174,7 +245,7 @@ void Game::drawEntities()
 
 void Game::playerMovement(ALLEGRO_EVENT event)
 {
-    if (player.isAlive()[0])
+    if (player.getState().alive)
     {
         switch (event.type)
         {
@@ -190,7 +261,10 @@ void Game::playerMovement(ALLEGRO_EVENT event)
                 break;
 
             case ALLEGRO_KEY_L:
-                bulletsAlly.push_back(player.shoot());
+                if (!player.getState().hacked)
+                {
+                    bulletsAlly.push_back(player.shoot());
+                }
                 break;
             }
             break;

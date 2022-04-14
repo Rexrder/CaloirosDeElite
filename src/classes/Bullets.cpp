@@ -1,6 +1,6 @@
 #include "Bullets.h"
 
-Bullets::Bullets(int xstart, int ystart,bool player) : Objects(xstart, ystart)
+Bullets::Bullets(int xstart, int ystart,bool player, int type) : Objects(xstart, ystart)
 {
     end = false;
     speed = -15;
@@ -13,7 +13,17 @@ Bullets::Bullets(int xstart, int ystart,bool player) : Objects(xstart, ystart)
 
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     spritesheet = al_create_bitmap(32, 32);
-    al_set_path_filename(path, "/res/bullets.png");
+    
+    switch (type)
+    {
+    case 0:
+        al_set_path_filename(path, "/res/bullets.png");
+        break;
+    
+    case 1:
+        al_set_path_filename(path, "/res/strike.png");
+        break;
+    }
     spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
 }
 

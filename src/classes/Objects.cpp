@@ -18,19 +18,48 @@ int * Objects::getSize(){
     return posSize;
 }
 
-bool* Objects::isAlive(){
-    return aliveErase;
+State Objects::getState(){
+    return state;
 }
 
-void Objects::shot(int lost = 1){
+void Objects::shot(int lost, int ch_state){
     lives -= lost;
     if (lives <= 0){
-        aliveErase[0]=false;
-        anim = 5;
-        anim_mov = 1;
+        state.alive = false;
     }
-    else{
-        anim = 4;
-        anim_mov = -1;
+    switch (ch_state)
+    {
+    case 0:  
+        break;
+    case 1:
+        state.hacked = true;
+        state.timer.hacked = time(0) + 3;
+        break;
+    case 2:
+        state.slowed = true;
+        state.timer.slowed = time(0) + 5;
+        break;
+    case 3:
+        state.stunned = true;
+        state.timer.stunned = time(0) + 3;
+        break;
+    }
+}
+
+void Objects::updateState(){
+    if (state.timer.buffed <= time(NULL) && state.buffed){
+        state.buffed = false;
+    }
+    if (state.timer.invulnerable <= time(NULL) && state.invulnerable){
+        state.invulnerable = false;
+    }
+    if (state.timer.hacked <= time(NULL) && state.hacked){
+        state.hacked = false;
+    }
+    if (state.timer.slowed <= time(NULL) && state.slowed){
+        state.slowed = false;
+    }
+    if (state.timer.stunned <= time(NULL) && state.stunned){
+        state.stunned = false;
     }
 }
