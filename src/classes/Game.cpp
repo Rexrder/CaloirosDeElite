@@ -32,7 +32,7 @@ void Game::createEnemies(int x_n, int y_n)
 
     wave++;
 
-    if (/*wave % 5 == 0 &&*/ bossesAvailable.size() == 0)
+    if (/*wave % 3 == 0 &&*/ bossesAvailable.size() == 0)
     {
         bossesAvailable.push_back(new Bosses(0, difficulty));
     }
@@ -43,7 +43,6 @@ void Game::createEnemies(int x_n, int y_n)
         {
             rand_val = rand();
             enemy_app = (rand_val % 5 != 0) ? rand_val % 5 : (rand_val % 5) + 1;
-
             enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty));
         }
     }
@@ -191,6 +190,7 @@ int Game::moveEntities()
         if (n->getState().erase)
         {
             score += ceil(1000 * difficulty);
+            player.buff(n->getType());
             bossesAvailable.remove(n);
             delete n;
         }

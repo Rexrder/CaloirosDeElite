@@ -41,7 +41,8 @@ bool animation(int start, int end, int *anim, int *anim_mov, bool ping_pong){
                 *anim_mov = -1;
             }
             else{
-                *anim = end - 1;
+                end_cycle = true;
+                *anim = start - 1;
             }
         }
         *anim += *anim_mov;

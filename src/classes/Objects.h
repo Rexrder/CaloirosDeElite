@@ -4,6 +4,8 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_windows.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -14,6 +16,14 @@ using std::cout;
 using std::floor;
 using std::time;
 
+struct SoundEffects
+{
+    ALLEGRO_SAMPLE *dead = NULL;
+    ALLEGRO_SAMPLE *hit = NULL;
+    ALLEGRO_SAMPLE *sp_att = NULL;
+    ALLEGRO_SAMPLE *appear = NULL;
+    //ALLEGRO_SAMPLE *buff = NULL;
+};
 struct Timers
 {
     std::time_t stunned = time(NULL);

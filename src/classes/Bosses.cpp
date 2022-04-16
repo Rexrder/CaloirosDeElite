@@ -1,10 +1,11 @@
 #include "Bosses.h"
 
-Bosses::Bosses(int type, double diff)
+Bosses::Bosses(int typ, double diff)
 {
     x = -200;
     y = 300;
     difficulty = diff;
+    type = typ;
 
     size[0] = 128;
     size[1] = 126;
@@ -17,7 +18,13 @@ Bosses::Bosses(int type, double diff)
         color[0] = 100;
         color[1] = 155;
         color[2] = 255;
+
         al_set_path_filename(path, "/res/fis.png");
+        spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
+
+        path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+        al_set_path_filename(path, "/res/sound/effects/fis_spatt.ogg");
+        sounds.sp_att = al_load_sample(al_path_cstr(path, '/'));
         break;
 
     default:
@@ -25,18 +32,22 @@ Bosses::Bosses(int type, double diff)
     }
 
     lives = 25 * difficulty;
-    spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
     speed = (floor(5 * diff) >= 30) ? 30 : floor(5 * diff);
 }
 
 Bosses::~Bosses()
 {
     al_destroy_bitmap(spritesheet);
+    al_destroy_sample(sounds.sp_att);
 }
 
 Bullets *Bosses::shootNormal()
 {
     return new Bullets(x + size[0] - 16, y + 64, false);
+}
+
+int Bosses::getType(){
+    return type;
 }
 
 bool Bosses::shootSpecial()
@@ -45,6 +56,7 @@ bool Bosses::shootSpecial()
         int probability = (difficulty <= 6) ? rand() % (int)floor(600 / difficulty) : rand() % (int)floor(600 / 6);
         if (probability == 0)
         {
+            al_play_sample(sounds.sp_att, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             state.buffed = true;
             state.timer.buffed = time(0) + 5;
         }

@@ -10,11 +10,19 @@ int main()
     al_init_image_addon();
     al_init_font_addon();
     al_init_ttf_addon();
+    al_init_acodec_addon();
     al_install_keyboard();
+    al_install_audio();
 
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_set_path_filename(path, "/res/logo.png");
     ALLEGRO_BITMAP *logo = al_load_bitmap(al_path_cstr(path, '/'));
+
+    path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_set_path_filename(path, "/res/sound/music/background.ogg");
+    ALLEGRO_AUDIO_STREAM *b_music = al_load_audio_stream(al_path_cstr(path, '/'), 4, 1024);
+    al_set_audio_stream_gain(b_music, 0.5);
+    al_set_audio_stream_playmode(b_music, ALLEGRO_PLAYMODE_LOOP);
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0 / 30.0);
     ALLEGRO_TIMER *timer2 = al_create_timer(3.0 / 10.0);
@@ -27,12 +35,16 @@ int main()
     al_register_event_source(queue, al_get_display_event_source(disp));
     al_register_event_source(queue, al_get_timer_event_source(timer));
     al_register_event_source(queue, al_get_timer_event_source(timer2));
+    al_reserve_samples(6);
 
     bool redraw = true;
     ALLEGRO_EVENT event;
     srand(time(0));
     Game new_game(4);
 
+    
+    al_attach_audio_stream_to_mixer(b_music, al_get_default_mixer());
+    al_set_audio_stream_playing(b_music, true);
     al_start_timer(timer);
     al_start_timer(timer2);
     while (!end)
@@ -84,6 +96,7 @@ int main()
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
+     al_destroy_audio_stream(b_music);
 
     return 0;
 }
