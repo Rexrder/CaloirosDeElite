@@ -54,6 +54,7 @@ void Game::createEnemies(int x_n, int y_n)
 
 void Game::collisionHandler()
 {
+    int area[4];
     bool hit = false;
     for (Bullets *const &n : bulletsAlly)
     {
@@ -104,7 +105,11 @@ void Game::collisionHandler()
     {
         if (n->shootSpecial())
         {
-            int area[4] = {n->getSize()[0] + n->getShotGap(), n->getSize()[1], n->getSize()[2]- n->getShotGap(), HEIGHT};
+            area[0] = n->getSize()[0] + n->getShotGap();
+            area[1] = n->getSize()[1];
+            area[2] = n->getSize()[2]- n->getShotGap();
+            area[3] = HEIGHT;
+            
             if (verifyCollision(area, player.getSize()) && player.getState().alive && !player.getState().invulnerable)
             {
                 switch (n->getType())
