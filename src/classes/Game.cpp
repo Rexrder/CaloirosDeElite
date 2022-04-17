@@ -10,6 +10,9 @@ Game::Game(int diff = 1, int mod = 0)
     mode = mod;
     score = 0;
     wave = 0;
+
+    score_buffs[0] = ceil(difficulty*2500);
+    score_buffs[1] = ceil(difficulty*10000);
 }
 
 Game::~Game()
@@ -21,7 +24,7 @@ void Game::drawUI()
     if (mode == 0)
     {
         std::string score_str = "SCORE: " + std::to_string(score);
-        al_draw_text(font, al_map_rgb(255, 255, 255), 1200, 25, ALLEGRO_ALIGN_RIGHT, score_str.c_str());
+        al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH, 25, ALLEGRO_ALIGN_RIGHT, score_str.c_str());
     }
 };
 
@@ -32,8 +35,9 @@ void Game::createEnemies(int x_n, int y_n)
 
     wave++;
 
-    if (/*wave % 3 == 0 &&*/ bossesAvailable.size() == 0)
+    if (/*wave % 5 == 0 &&*/ bossesAvailable.size() == 0)
     {
+        bossesAvailable.push_back(new Bosses(2, difficulty, true));
         bossesAvailable.push_back(new Bosses(0, difficulty));
     }
 
@@ -102,10 +106,23 @@ void Game::collisionHandler()
     {
         if (n->shootSpecial())
         {
-            int area[4] = {n->getSize()[0], n->getSize()[1], n->getSize()[2], 1200};
+            int area[4] = {n->getSize()[0] + n->getShotGap(), n->getSize()[1], n->getSize()[2]- n->getShotGap(), HEIGHT};
             if (verifyCollision(area, player.getSize()) && player.getState().alive && !player.getState().invulnerable)
             {
-                player.shot(2,1);
+                switch (n->getType())
+                {
+                case 0:
+                    player.shot(2,1);
+                    break;
+                
+                case 1:
+                    player.shot(1,2);
+                    break;
+                
+                case 2:
+                    player.shot(10,3);
+                    break;
+                }
                 score = (score <= 100) ? 0 : score - 100;
             };
         }
@@ -189,14 +206,24 @@ int Game::moveEntities()
         };
         if (n->getState().erase)
         {
-            score += ceil(1000 * difficulty);
+            score = (n->isMegaboss()) ? score + ceil(10000 * difficulty) : score + ceil(1000 * difficulty);
             player.buff(n->getType());
             bossesAvailable.remove(n);
             delete n;
         }
     }
 
-    if (player.getState().alive)
+    if (score > score_buffs[0]){
+        player.buff(1);
+        score_buffs[0]+= ceil(2500*difficulty);
+        if (score > score_buffs[1])
+        {
+            player.buff(2);
+            score_buffs[1]+= ceil(10000*difficulty);
+        }     
+    }
+
+    if (player.getState().alive && !player.getState().stunned)
     {
         player.move();
     }

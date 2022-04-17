@@ -16,13 +16,16 @@ using std::cout;
 using std::floor;
 using std::time;
 
+#define HEIGHT 950
+#define WIDTH 1200
+
 struct SoundEffects
 {
     ALLEGRO_SAMPLE *dead = NULL;
     ALLEGRO_SAMPLE *hit = NULL;
     ALLEGRO_SAMPLE *sp_att = NULL;
     ALLEGRO_SAMPLE *appear = NULL;
-    //ALLEGRO_SAMPLE *buff = NULL;
+    ALLEGRO_SAMPLE *buff = NULL;
 };
 struct Timers
 {

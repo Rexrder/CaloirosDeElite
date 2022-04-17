@@ -27,7 +27,7 @@ int main()
     ALLEGRO_TIMER *timer = al_create_timer(1.0 / 30.0);
     ALLEGRO_TIMER *timer2 = al_create_timer(3.0 / 10.0);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
-    ALLEGRO_DISPLAY *disp = al_create_display(1200, 950);
+    ALLEGRO_DISPLAY *disp = al_create_display(WIDTH, HEIGHT);
     al_set_window_title(disp, "Caloiros De Elite");
     al_set_display_icon(disp, logo);
 
@@ -39,14 +39,15 @@ int main()
 
     bool redraw = true;
     ALLEGRO_EVENT event;
-    srand(time(0));
-    Game new_game(4);
 
+    srand(time(0));
+    Game new_game(2.6);
     
     al_attach_audio_stream_to_mixer(b_music, al_get_default_mixer());
     al_set_audio_stream_playing(b_music, true);
     al_start_timer(timer);
     al_start_timer(timer2);
+
     while (!end)
     {
         al_wait_for_event(queue, &event);
@@ -96,7 +97,7 @@ int main()
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
-     al_destroy_audio_stream(b_music);
+    al_destroy_audio_stream(b_music);
 
     return 0;
 }

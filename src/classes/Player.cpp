@@ -18,6 +18,10 @@ Player::Player(int xstart, int ystart) : Objects(xstart, ystart)
     al_set_path_filename(path, "/res/sound/effects/plshot.wav");
     sounds.hit = al_load_sample(al_path_cstr(path, '/'));
 
+    path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_set_path_filename(path, "/res/sound/effects/buff.ogg");
+    sounds.buff = al_load_sample(al_path_cstr(path, '/'));
+
     speed = 15;
     lives = 3;
     size[0] = 64;
@@ -75,6 +79,7 @@ void Player::animate(){
 
 void Player::move(){
     int realSpeed = (state.buffed) ? speed*2 : speed;
+    realSpeed = (state.slowed) ? realSpeed/2 : realSpeed;
     updateState();
     if (movState[0]){
         x -= realSpeed;
@@ -100,6 +105,7 @@ void Player::shot(int lost, int type){
 }
 
 void Player::buff(int type){
+    al_play_sample(sounds.buff, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
     switch (type)
     {
     case 0:
@@ -112,6 +118,13 @@ void Player::buff(int type){
         state.timer.invulnerable = time(0) + 5;
         lives++;
         lif_new_anim = 0;
+        break;
+
+    case 2:
+        state.invulnerable = true;
+        state.timer.invulnerable = time(0) + 10;
+        state.buffed = true;
+        state.timer.buffed = time(0) + 10;
         break;
     }
 }

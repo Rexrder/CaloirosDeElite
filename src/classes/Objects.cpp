@@ -29,15 +29,13 @@ void Objects::shot(int lost, int ch_state){
     }
     switch (ch_state)
     {
-    case 0:  
-        break;
     case 1:
         state.hacked = true;
-        state.timer.hacked = time(0) + 3;
+        state.timer.hacked = time(0) + 6;
         break;
     case 2:
         state.slowed = true;
-        state.timer.slowed = time(0) + 5;
+        state.timer.slowed = time(0) + 6;
         break;
     case 3:
         state.stunned = true;

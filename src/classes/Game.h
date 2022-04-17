@@ -7,10 +7,11 @@ private:
     std::list<Enemies *> enemiesAvailable;
     std::list<Bosses *> bossesAvailable;
 
+    unsigned int score_buffs[2];
     bool enem_dir;
     double difficulty;
     Player player = *new Player(518, 880);
-    int score;
+    unsigned int score;
     int mode;
     int wave;
     ALLEGRO_FONT *font;
