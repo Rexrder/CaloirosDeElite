@@ -32,6 +32,10 @@ Bullets::~Bullets()
     al_destroy_bitmap(spritesheet);
 }
 
+void Bullets::collide(){
+    end = true;
+}
+
 void Bullets::move(){
     y += speed;
     if (y <= 5 || y >= 1100){

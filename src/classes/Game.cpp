@@ -76,8 +76,7 @@ void Game::collisionHandler()
         if (hit)
         {
             hit = false;
-            bulletsAlly.remove(n);
-            delete n;
+            n->collide();
         }
     }
 
@@ -85,8 +84,7 @@ void Game::collisionHandler()
     {
         if (verifyCollision(n->getSize(), player.getSize()) && player.getState().alive && !player.getState().invulnerable)
         {
-            bulletsEnemies.remove(n);
-            delete n;
+            n->collide();
             player.shot();
             score = (score <= 50) ? 0 : score - 50;
             difficulty = (difficulty <= 2) ? 2 : difficulty - 0.4;
@@ -133,23 +131,32 @@ int Game::moveEntities()
 {
     int probability;
 
-    for (Bullets *const &n : bulletsEnemies)
+    auto n_bullets = bulletsEnemies.begin();
+    while (n_bullets != bulletsEnemies.end())
     {
-        n->move();
-        if (n->isAlive())
+        (*n_bullets)->move();
+        if ((*n_bullets)->isAlive())
         {
-            bulletsEnemies.remove(n);
-            delete n;
+            delete (*n_bullets);
+            n_bullets = bulletsEnemies.erase(n_bullets);         
+        }
+        else{
+            ++n_bullets;
         }
     }
 
-    for (Bullets *const &n : bulletsAlly)
+    n_bullets = bulletsAlly.begin();
+    while (n_bullets != bulletsAlly.end())
     {
-        n->move();
-        if (n->isAlive())
+        (*n_bullets)->move();
+        if ((*n_bullets)->isAlive())
         {
-            bulletsAlly.remove(n);
-            delete n;
+            delete (*n_bullets);
+            n_bullets = bulletsAlly.erase(n_bullets);
+            --n_bullets;
+        }
+        else{
+            ++n_bullets;
         }
     }
 
@@ -159,9 +166,10 @@ int Game::moveEntities()
         createEnemies(10, 10);
     }
 
-    for (Enemies *const &n : enemiesAvailable)
+    auto n_enemies = enemiesAvailable.begin();
+    while (n_enemies != enemiesAvailable.end())
     {
-        if (n->move(enemiesAvailable.size()))
+        if ((*n_enemies)->move(enemiesAvailable.size()))
         {
             enem_dir = true;
         }
@@ -173,18 +181,20 @@ int Game::moveEntities()
         {
             probability = (difficulty <= 6) ? rand() % (int)floor(1200 / difficulty) : rand() % (int)floor(1200 / 6);
         }
-        if (probability == 0 && n->getSize()[1] > 0)
+        if (probability == 0 && (*n_enemies)->getSize()[1] > 0)
         {
-            bulletsEnemies.push_back(n->shoot());
+            bulletsEnemies.push_back((*n_enemies)->shoot());
         };
-        if (n->getSize()[1] > 1100 || n->getState().erase)
+        if ((*n_enemies)->getSize()[1] > 1100 || (*n_enemies)->getState().erase)
         {
-            if (n->getState().erase)
+            if ((*n_enemies)->getState().erase)
             {
                 score += ceil(10 * difficulty);
             }
-            enemiesAvailable.remove(n);
-            delete n;
+            delete (*n_enemies);
+            n_enemies = enemiesAvailable.erase(n_enemies);
+        }else{
+            ++n_enemies;
         }
     }
     if (enem_dir)
@@ -196,20 +206,23 @@ int Game::moveEntities()
         enem_dir = false;
     }
 
-    for (Bosses *const &n : bossesAvailable)
+    auto n_bosses = bossesAvailable.begin();
+    while (n_bosses != bossesAvailable.end())
     {
-        n->move();
+        (*n_bosses)->move();
         probability = (difficulty <= 6) ? rand() % (int)floor(300 / difficulty) : rand() % (int)floor(300 / 6);
-        if (probability == 0 && n->getSize()[0] > 0)
+        if (probability == 0 && (*n_bosses)->getSize()[0] > 0)
         {
-            bulletsEnemies.push_back(n->shootNormal());
+            bulletsEnemies.push_back((*n_bosses)->shootNormal());
         };
-        if (n->getState().erase)
+        if ((*n_bosses)->getState().erase)
         {
-            score = (n->isMegaboss()) ? score + ceil(10000 * difficulty) : score + ceil(1000 * difficulty);
-            player.buff(n->getType());
-            bossesAvailable.remove(n);
-            delete n;
+            score = ((*n_bosses)->isMegaboss()) ? score + ceil(10000 * difficulty) : score + ceil(1000 * difficulty);
+            player.buff((*n_bosses)->getType());
+            delete (*n_bosses);
+            n_bosses = bossesAvailable.erase(n_bosses);
+        }else{
+            ++n_bosses;
         }
     }
 

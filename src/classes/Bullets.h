@@ -10,4 +10,5 @@ public:
     bool isAlive();
     void move();
     void draw();
+    void collide();
 };
