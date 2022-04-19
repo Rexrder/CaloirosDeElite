@@ -2,7 +2,6 @@
 
 Bullets::Bullets(int xstart, int ystart,bool player, int type) : Objects(xstart, ystart)
 {
-    end = false;
     speed = -15;
     if (!player){
         speed = -speed;
@@ -33,20 +32,16 @@ Bullets::~Bullets()
 }
 
 void Bullets::collide(){
-    end = true;
+    state.erase = true;
 }
 
 void Bullets::move(){
     y += speed;
-    if (y <= 5 || y >= 1100){
-        end = true;
+    if (y <= 5 || y >= HEIGHT){
+        state.erase = true;
     }
 }
 
 void Bullets::draw(){
     al_draw_bitmap(spritesheet, x, y, 0);
 };
-
-bool Bullets::isAlive(){
-    return end;
-}

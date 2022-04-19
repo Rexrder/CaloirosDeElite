@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(int diff = 1, int mod = 0)
+Game::Game(int diff, int mod, int pl_type)
 {
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_set_path_filename(path, "/res/font.ttf");
@@ -10,9 +10,9 @@ Game::Game(int diff = 1, int mod = 0)
     mode = mod;
     score = 0;
     wave = 0;
-
-    score_buffs[0] = ceil(difficulty*2500);
-    score_buffs[1] = ceil(difficulty*10000);
+    player = new Player(pl_type);
+    score_buffs[0] = ceil(difficulty * 2500);
+    score_buffs[1] = ceil(difficulty * 10000);
 }
 
 Game::~Game()
@@ -32,13 +32,22 @@ void Game::createEnemies(int x_n, int y_n)
 {
     int rand_val;
     int enemy_app;
+    bool mega_boss = false;
 
     wave++;
 
-    if (/*wave % 5 == 0 &&*/ bossesAvailable.size() == 0)
+    for (Bosses *const &n : bossesAvailable){
+        if (n->isMegaboss()){
+            mega_boss = true;
+        }
+    }
+
+    if (/*wave % 5 == 0 &&*/ bossesAvailable.size() <= 2)
     {
-        bossesAvailable.push_back(new Bosses(2, difficulty, true));
-        bossesAvailable.push_back(new Bosses(0, difficulty));
+        if(!mega_boss){
+            bossesAvailable.push_back(new Bosses(rand() % 3, difficulty, true));
+        }
+        bossesAvailable.push_back(new Bosses(rand() % 3, difficulty));
     }
 
     for (int i = 0; i < x_n; i++)
@@ -46,7 +55,14 @@ void Game::createEnemies(int x_n, int y_n)
         for (int j = 0; j < y_n; j++)
         {
             rand_val = rand();
-            enemy_app = (rand_val % 5 != 0) ? rand_val % 5 : (rand_val % 5) + 1;
+            if (player->getType() == 0)
+            {
+                enemy_app = (rand_val % 5) + 1;
+            }
+            else
+            {
+                enemy_app = ((rand_val % 5) + 1 != player->getType()) ? (rand_val % 5) + 1 : 0;
+            }
             enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty));
         }
     }
@@ -83,10 +99,10 @@ void Game::collisionHandler()
 
     for (Bullets *const &n : bulletsEnemies)
     {
-        if (verifyCollision(n->getSize(), player.getSize()) && player.getState().alive && !player.getState().invulnerable)
+        if (verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable)
         {
             n->collide();
-            player.shot();
+            player->shot();
             score = (score <= 50) ? 0 : score - 50;
             difficulty = (difficulty <= 2) ? 2 : difficulty - 0.4;
         };
@@ -94,9 +110,9 @@ void Game::collisionHandler()
 
     for (Enemies *const &n : enemiesAvailable)
     {
-        if (verifyCollision(n->getSize(), player.getSize()) && player.getState().alive && !player.getState().invulnerable)
+        if (verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable && n->getState().alive)
         {
-            player.shot(10);
+            player->shot(10);
             score = (score <= 100) ? 0 : score - 100;
         };
     }
@@ -106,28 +122,39 @@ void Game::collisionHandler()
         if (n->shootSpecial())
         {
             area[0] = n->getSize()[0] + n->getShotGap();
-            area[1] = n->getSize()[1];
-            area[2] = n->getSize()[2]- n->getShotGap();
+            area[1] = 0;
+            area[2] = n->getSize()[2] - n->getShotGap();
             area[3] = HEIGHT;
-            
-            if (verifyCollision(area, player.getSize()) && player.getState().alive && !player.getState().invulnerable)
+
+            if (verifyCollision(area, player->getSize()) && player->getState().alive && !player->getState().invulnerable)
             {
                 switch (n->getType())
                 {
                 case 0:
-                    player.shot(2,1);
+                    player->shot(2, 1);
                     break;
-                
+
                 case 1:
-                    player.shot(1,2);
+                    player->shot(1, 2);
                     break;
-                
+
                 case 2:
-                    player.shot(10,3);
+                    player->shot(10, 3);
                     break;
                 }
                 score = (score <= 100) ? 0 : score - 100;
             };
+
+            if (n->getType() == 1)
+            {
+                for (Enemies *const &m : enemiesAvailable)
+                {
+                    if (verifyCollision(area, m->getSize()))
+                    {
+                        m->fortify();
+                    }
+                }
+            }
         }
     }
 }
@@ -140,12 +167,13 @@ int Game::moveEntities()
     while (n_bullets != bulletsEnemies.end())
     {
         (*n_bullets)->move();
-        if ((*n_bullets)->isAlive())
+        if ((*n_bullets)->getState().erase)
         {
             delete (*n_bullets);
-            n_bullets = bulletsEnemies.erase(n_bullets);         
+            n_bullets = bulletsEnemies.erase(n_bullets);
         }
-        else{
+        else
+        {
             ++n_bullets;
         }
     }
@@ -154,13 +182,14 @@ int Game::moveEntities()
     while (n_bullets != bulletsAlly.end())
     {
         (*n_bullets)->move();
-        if ((*n_bullets)->isAlive())
+        if ((*n_bullets)->getState().erase)
         {
             delete (*n_bullets);
             n_bullets = bulletsAlly.erase(n_bullets);
             --n_bullets;
         }
-        else{
+        else
+        {
             ++n_bullets;
         }
     }
@@ -198,7 +227,9 @@ int Game::moveEntities()
             }
             delete (*n_enemies);
             n_enemies = enemiesAvailable.erase(n_enemies);
-        }else{
+        }
+        else
+        {
             ++n_enemies;
         }
     }
@@ -223,35 +254,38 @@ int Game::moveEntities()
         if ((*n_bosses)->getState().erase)
         {
             score = ((*n_bosses)->isMegaboss()) ? score + ceil(10000 * difficulty) : score + ceil(1000 * difficulty);
-            player.buff((*n_bosses)->getType());
+            player->buff((*n_bosses)->getType());
             delete (*n_bosses);
             n_bosses = bossesAvailable.erase(n_bosses);
-        }else{
+        }
+        else
+        {
             ++n_bosses;
         }
     }
 
-    if (score > score_buffs[0]){
-        player.buff(1);
-        score_buffs[0]+= ceil(2500*difficulty);
+    if (score > score_buffs[0])
+    {
+        player->buff(1);
+        score_buffs[0] += ceil(2500 * difficulty);
         if (score > score_buffs[1])
         {
-            player.buff(2);
-            score_buffs[1]+= ceil(10000*difficulty);
-        }     
+            player->buff(2);
+            score_buffs[1] += ceil(10000 * difficulty);
+        }
     }
 
-    if (player.getState().alive && !player.getState().stunned)
+    if (player->getState().alive && !player->getState().stunned)
     {
-        player.move();
+        player->move();
     }
 
-    return (player.getState().erase);
+    return (player->getState().erase);
 }
 
 void Game::animateEntities()
 {
-    player.animate();
+    player->animate();
     for (Enemies *const &n : enemiesAvailable)
     {
         n->animate();
@@ -264,7 +298,7 @@ void Game::animateEntities()
 
 void Game::drawEntities()
 {
-    player.draw();
+    player->draw();
 
     for (Bullets *const &n : bulletsEnemies)
     {
@@ -290,7 +324,7 @@ void Game::drawEntities()
 
 void Game::playerMovement(ALLEGRO_EVENT event)
 {
-    if (player.getState().alive)
+    if (player->getState().alive)
     {
         switch (event.type)
         {
@@ -298,17 +332,17 @@ void Game::playerMovement(ALLEGRO_EVENT event)
             switch (event.keyboard.keycode)
             {
             case ALLEGRO_KEY_A:
-                player.changeMove(true, 0);
+                player->changeMove(true, 0);
                 break;
 
             case ALLEGRO_KEY_D:
-                player.changeMove(true, 1);
+                player->changeMove(true, 1);
                 break;
 
             case ALLEGRO_KEY_L:
-                if (!player.getState().hacked)
+                if (!player->getState().hacked)
                 {
-                    bulletsAlly.push_back(player.shoot());
+                    bulletsAlly.push_back(player->shoot());
                 }
                 break;
             }
@@ -318,11 +352,11 @@ void Game::playerMovement(ALLEGRO_EVENT event)
             switch (event.keyboard.keycode)
             {
             case ALLEGRO_KEY_A:
-                player.changeMove(false, 0);
+                player->changeMove(false, 0);
                 break;
 
             case ALLEGRO_KEY_D:
-                player.changeMove(false, 1);
+                player->changeMove(false, 1);
                 break;
             }
             break;

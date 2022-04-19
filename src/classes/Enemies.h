@@ -11,6 +11,6 @@ public:
     void draw();
     void animate();
     void changeMove();
-    void kill();
+    void fortify();
     Bullets* shoot();
 };

@@ -41,7 +41,7 @@ int main()
     ALLEGRO_EVENT event;
 
     srand(time(0));
-    Game new_game(2.6);
+    Game new_game(3,0);
     
     al_attach_audio_stream_to_mixer(b_music, al_get_default_mixer());
     al_set_audio_stream_playing(b_music, true);

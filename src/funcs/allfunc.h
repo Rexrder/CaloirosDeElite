@@ -1,5 +1,5 @@
 bool verifyCollision(int obj1[4], int obj2[4]);
-bool animate(int start, int end, int* anim, int* anim_mov, bool ping_pong);
+bool animation(int start, int end, int* anim, int* anim_mov, bool ping_pong);
 
 bool verifyCollision(int obj1[4], int obj2[4]) //function to verify collisions between two 
 {

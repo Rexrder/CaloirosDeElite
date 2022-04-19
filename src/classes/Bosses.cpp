@@ -5,7 +5,7 @@ Bosses::Bosses(int typ, double diff, bool m_b)
     difficulty = diff;
     type = typ;
     mega_boss = m_b;
-    x = -200;
+    x = (mega_boss) ? WIDTH + 200 : -200;
     y = 300 - 64*type;
 
     size[0] = 128;
@@ -35,11 +35,12 @@ Bosses::Bosses(int typ, double diff, bool m_b)
         break;
 
     case 1:
-        size[0] = 121;
-        size[1] = 121;
-        color[0] = 100;
-        color[1] = 155;
-        color[2] = 255;
+        size[0] = 65;
+        size[1] = 117;
+        color[0] = 251;
+        color[1] = 242;
+        color[2] = 54;
+        shot_gap = 16;
 
         al_set_path_filename(path, "/res/med.png");
         spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
@@ -159,7 +160,7 @@ void Bosses::move()
     {
         x -= (5 + floor(speed * (1.00 - (lives / original_lives))));
     }
-    if ((x > (1170 - size[0]) && moving_right) || (x < 60 && !moving_right))
+    if ((x > (WIDTH - 60 - size[0]) && moving_right) || (x < 60 && !moving_right))
     {
         changeMove();
     }
@@ -172,9 +173,13 @@ void Bosses::changeMove()
 
 void Bosses::draw()
 {
+    int vertical_origin = (type == 1) ? 0 : y + size[1] - 40;
+    int life_bar = ceil((WIDTH - 10)*(lives / original_lives));
+    life_bar = (life_bar < 0) ? 0 : life_bar;
+
     if (state.buffed && anim >= 5 && anim <= 8)
     {
-        al_draw_filled_rectangle(x + shot_gap, y + size[1] - 40, x + size[0] - shot_gap, 950, al_map_rgba(ceil(color[0] * ((anim - 4) / 4.00)), ceil(color[1] * ((anim - 4) / 4.00)), ceil(color[2] * ((anim - 4) / 4.00)), ceil(255 * ((anim - 4) / 4.00))));
+        al_draw_filled_rectangle(x + shot_gap, vertical_origin, x + size[0] - shot_gap, 950, al_map_rgba(ceil(color[0] * ((anim - 4) / 4.00)), ceil(color[1] * ((anim - 4) / 4.00)), ceil(color[2] * ((anim - 4) / 4.00)), ceil(255 * ((anim - 4) / 4.00))));
     }
     al_draw_bitmap_region(spritesheet, size[0] * anim, 0, size[0], size[1], x, y, 0);
 

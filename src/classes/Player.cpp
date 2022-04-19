@@ -1,9 +1,10 @@
 #include "Player.h"
 
-Player::Player(int xstart, int ystart) : Objects(xstart, ystart)
+Player::Player(int pl_type)
 {
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-    al_set_path_filename(path, "/res/eletrao.png");
+    type = pl_type;
+    al_set_path_filename(path, pl_skins[type].c_str());
     spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
 
     path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
@@ -26,6 +27,8 @@ Player::Player(int xstart, int ystart) : Objects(xstart, ystart)
     lives = 3;
     size[0] = 64;
     size[1] = 64;
+    x = WIDTH/2 - size[0]/2;
+    y = HEIGHT - 70;
 }
 
 Player::~Player()
@@ -87,8 +90,8 @@ void Player::move(){
     if (movState[1]){
         x += realSpeed;
     }
-    x = (x < 1126) ? x : x - speed;
-    x = (x > 60) ? x : x + speed;
+    x = (x < WIDTH - size[0] - 60) ? x : x - realSpeed;
+    x = (x > 60) ? x : x + realSpeed;
 }
 
 void Player::shot(int lost, int type){
@@ -129,13 +132,17 @@ void Player::buff(int type){
     }
 }
 
+int Player::getType(){
+    return type;
+}
+
 void Player::draw(){
     int design_lives = (lives < last_lives) ? lives : last_lives;
     al_draw_bitmap_region(spritesheet, 64*anim, 0, 64, 64, x, y, 0);
     for (int i = 1; i <= design_lives; i++){
-        al_draw_bitmap_region(spritesheet_life, 64*lif_anim,0,64,64,0,950-(i*64),0);
+        al_draw_bitmap_region(spritesheet_life, 64*lif_anim,0,64,64,0,HEIGHT-(i*64),0);
     }
     for (int i = design_lives+1; i <= design_lives + std::abs(lives - last_lives); i++){
-        al_draw_bitmap_region(spritesheet_life, 64*lif_new_anim,0,64,64,0,950-(i*64),0);
+        al_draw_bitmap_region(spritesheet_life, 64*lif_new_anim,0,64,64,0,HEIGHT-(i*64),0);
     }
 };

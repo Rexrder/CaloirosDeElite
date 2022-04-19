@@ -10,14 +10,15 @@
 #include <cmath>
 #include <ctime>
 #include <list>
+#include <cstring>
 #include "..\funcs\allfunc.h"
 using std::ceil;
 using std::cout;
 using std::floor;
 using std::time;
 
-#define HEIGHT 950
-#define WIDTH 1200
+#define HEIGHT 900
+#define WIDTH 1300
 
 struct SoundEffects
 {
@@ -49,6 +50,7 @@ struct State
 class Objects
 {
 protected:
+    std::string pl_skins[6]={"/res/eletrao.png","/res/egsi.png","/res/eciv.png","/res/epol.png","/res/etext.png","/res/emat.png"};
     State state;
     int x;
     int y;

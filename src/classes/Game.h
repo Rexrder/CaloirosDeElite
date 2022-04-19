@@ -10,14 +10,14 @@ private:
     unsigned int score_buffs[2];
     bool enem_dir;
     double difficulty;
-    Player player = *new Player(518, 880);
+    Player *player;
     unsigned int score;
     int mode;
     int wave;
     ALLEGRO_FONT *font;
 
 public:
-    Game(int diff, int mod);
+    Game(int = 1, int = 0, int = 0);
     ~Game();
     void createEnemies(int, int);
     void animateEntities();

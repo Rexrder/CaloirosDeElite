@@ -6,27 +6,7 @@ Enemies::Enemies(int xstart, int ystart, int type, double diff) : Objects(xstart
     size[1] = 64;
 
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-    switch (type)
-    {
-    case 0:
-        al_set_path_filename(path, "/res/eletrao.png");
-        break;
-
-    case 1:
-        al_set_path_filename(path, "/res/egsi.png");
-        break;
-
-    case 2:
-        al_set_path_filename(path, "/res/eciv.png");
-        break;
-    case 3:
-        al_set_path_filename(path, "/res/epol.png");
-        break;
-    case 4:
-        al_set_path_filename(path, "/res/etext.png");
-        break;
-    }
-
+    al_set_path_filename(path, pl_skins[type].c_str());
     spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
     speed = 10 + ceil(10 * diff);
 }
@@ -47,7 +27,13 @@ void Enemies::animate()
         animation(5,7,&anim,&anim_mov,false);
     }
     else{
-        animation(0,2,&anim,&anim_mov,true);
+        if (lives == 2)
+        {
+            animation(8,10,&anim,&anim_mov,false);
+        }
+        else{
+            animation(0,2,&anim,&anim_mov,true);   
+        }
     }
 
     if (anim == 7){
@@ -55,12 +41,16 @@ void Enemies::animate()
     }
 }
 
+void Enemies::fortify(){
+    lives = 2;
+}
+
 bool Enemies::move(int n_left)
 {
     if (moving_right)
     {
         x = ((ceil(speed / n_left)) > 30) ? x + 30 + ceil(speed / 10) : x + ceil(speed / n_left) + ceil(speed / 10);
-        if (x > 1120)
+        if (x > WIDTH - size[0] - 60)
         {
             return true;
         }
