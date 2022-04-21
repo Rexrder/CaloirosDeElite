@@ -1,5 +1,8 @@
-#include "Player.cpp"
+#include "Bullets.h"
+#include "Objects.h"
 
+#ifndef ENEMIES_H
+#define ENEMIES_H
 class Enemies: public Objects
 {
 private:
@@ -14,3 +17,5 @@ public:
     void fortify();
     Bullets* shoot();
 };
+
+#endif

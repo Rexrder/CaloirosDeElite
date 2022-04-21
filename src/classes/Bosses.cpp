@@ -1,4 +1,17 @@
 #include "Bosses.h"
+#include "Bullets.h"
+#include "Funcs.h"
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
+#include <cmath>
+#include <cstring>
+#include <iostream>
+
 
 Bosses::Bosses(int typ, double diff, bool m_b)
 {
@@ -61,7 +74,7 @@ Bosses::Bosses(int typ, double diff, bool m_b)
 
     lives = (mega_boss) ? 150 * difficulty : 25 * difficulty;
     original_lives = lives;
-    speed = (floor(5 * diff) >= 30) ? 30 : floor(5 * diff);
+    speed = (std::floor(5 * diff) >= 30) ? 30 : std::floor(5 * diff);
 }
 
 Bosses::~Bosses()
@@ -92,7 +105,7 @@ bool Bosses::shootSpecial()
 {
     if (!state.buffed)
     {
-        int probability = (difficulty <= 6) ? rand() % (int)floor(600 / difficulty) : rand() % (int)floor(600 / 6);
+        int probability = (difficulty <= 6) ? rand() % (int)std::floor(600 / difficulty) : rand() % (int)std::floor(600 / 6);
         if (probability == 0)
         {
             al_play_sample(sounds.sp_att, 0.7, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -116,7 +129,7 @@ void Bosses::shot(int lost, int type)
     if (lives > 0)
     {
         state.invulnerable = true;
-        state.timer.invulnerable = time(0) + 1;
+        state.timer.invulnerable = std::time(0) + 1;
     }
 }
 
@@ -124,23 +137,23 @@ void Bosses::animate()
 {
     if (!state.alive)
     {
-        animation(12, 14, &anim, &anim_mov, false);
+        Funcs::animation(12, 14, &anim, &anim_mov, false);
     }
     else if (state.buffed)
     {
-        state.buffed = !animation(5, 8, &anim, &anim_mov, true);
+        state.buffed = !Funcs::animation(5, 8, &anim, &anim_mov, true);
     }
     else if (state.slowed)
     {
-        animation(9, 11, &anim, &anim_mov, true);
+        Funcs::animation(9, 11, &anim, &anim_mov, true);
     }
     else if (state.invulnerable)
     {
-        state.invulnerable = !animation(3, 4, &anim, &anim_mov, true);
+        state.invulnerable = !Funcs::animation(3, 4, &anim, &anim_mov, true);
     }
     else
     {
-        animation(0, 2, &anim, &anim_mov, true);
+        Funcs::animation(0, 2, &anim, &anim_mov, true);
     }
 
     if (anim == 14)
@@ -154,11 +167,11 @@ void Bosses::move()
     updateState();
     if (moving_right)
     {
-        x += 5 + floor(speed * (1.00 - (lives / original_lives)));
+        x += 5 + std::floor(speed * (1.00 - (lives / original_lives)));
     }
     else
     {
-        x -= (5 + floor(speed * (1.00 - (lives / original_lives))));
+        x -= (5 + std::floor(speed * (1.00 - (lives / original_lives))));
     }
     if ((x > (WIDTH - 60 - size[0]) && moving_right) || (x < 60 && !moving_right))
     {
@@ -174,7 +187,7 @@ void Bosses::changeMove()
 void Bosses::draw()
 {
     int vertical_origin = (type == 1) ? 0 : y + size[1] - 40;
-    int life_bar = ceil((WIDTH - 10)*(lives / original_lives));
+    int life_bar = std::ceil((WIDTH - 10)*(lives / original_lives));
     life_bar = (life_bar < 0) ? 0 : life_bar;
 
     if (state.buffed && anim >= 5 && anim <= 8)

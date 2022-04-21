@@ -1,4 +1,6 @@
 #include "Objects.h"
+#include <ctime>
+using std::time;
 
 Objects::Objects(int xstart, int ystart)
 {
@@ -59,5 +61,8 @@ void Objects::updateState(){
     }
     if (state.timer.stunned <= time(NULL) && state.stunned){
         state.stunned = false;
+    }
+    if (state.timer.fast <= time(NULL) && state.fast){
+        state.fast = false;
     }
 }

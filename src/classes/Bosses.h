@@ -1,5 +1,11 @@
-#include "Enemies.cpp"
+#include "Bullets.h"
+#include "Objects.h"
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_font.h>
 
+#ifndef BOSSES_H
+#define BOSSES_H
 class Bosses: public Objects
 {
 private:
@@ -26,3 +32,5 @@ public:
     bool shootSpecial();
     void shot(int = 1, int = 0) override;
 };
+
+#endif

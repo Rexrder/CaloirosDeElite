@@ -1,25 +1,17 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_windows.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <iostream>
-#include <cmath>
 #include <ctime>
-#include <list>
 #include <cstring>
-#include "..\funcs\allfunc.h"
-using std::ceil;
-using std::cout;
-using std::floor;
 using std::time;
 
 #define HEIGHT 900
 #define WIDTH 1300
 
+#ifndef SOUNDEFFECTS_H
+#define SOUNDEFFECTS_H
 struct SoundEffects
 {
     ALLEGRO_SAMPLE *dead = NULL;
@@ -27,7 +19,12 @@ struct SoundEffects
     ALLEGRO_SAMPLE *sp_att = NULL;
     ALLEGRO_SAMPLE *appear = NULL;
     ALLEGRO_SAMPLE *buff = NULL;
+    ALLEGRO_SAMPLE *fast = NULL;
 };
+#endif
+
+#ifndef TIMERS_H
+#define TIMERS_H
 struct Timers
 {
     std::time_t stunned = time(NULL);
@@ -35,18 +32,31 @@ struct Timers
     std::time_t slowed = time(NULL);
     std::time_t buffed = time(NULL);
     std::time_t hacked = time(NULL);
+    std::time_t fast = time(NULL);
 };
+
+#endif
+
+#ifndef STATE_H
+#define STATE_H
 struct State
 {
     bool alive = true;
+    bool fast = false;
     bool erase = false;
     bool stunned = false;
     bool invulnerable = false;
     bool slowed = false;
     bool buffed = false;
     bool hacked = false;
+    bool fortifyed = false;
     Timers timer;
 };
+
+#endif
+
+#ifndef OBJECTS_H
+#define OBJECTS_H
 class Objects
 {
 protected:
@@ -70,3 +80,5 @@ public:
     virtual void shot(int = 1, int = 0);
     void updateState();
 };
+
+#endif

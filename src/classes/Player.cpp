@@ -1,6 +1,12 @@
 #include "Player.h"
+#include "Funcs.h"
+#include "Bullets.h"
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
-Player::Player(int pl_type)
+Player::Player(int pl_type, int max_l)
 {
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     type = pl_type;
@@ -27,6 +33,8 @@ Player::Player(int pl_type)
     lives = 3;
     size[0] = 64;
     size[1] = 64;
+
+    max_lives = max_l;
     x = WIDTH/2 - size[0]/2;
     y = HEIGHT - 70;
 }
@@ -49,30 +57,35 @@ Bullets* Player::shoot(){
 void Player::animate(){
 
     if (!state.alive){
-        animation(5,7,&anim,&anim_mov,false);
+        Funcs::animation(5,7,&anim,&anim_mov,false);
     }else
     if (state.invulnerable){
-        animation(3,4,&anim,&anim_mov,true);
+        Funcs::animation(3,4,&anim,&anim_mov,true);
+    }
+    else
+    if (state.buffed)
+    {
+        Funcs::animation(8,10,&anim,&anim_mov,true);
     }
     else{
-        animation(0,2,&anim,&anim_mov,true);
+        Funcs::animation(0,2,&anim,&anim_mov,true);
     }
 
     if (anim == 7){
         state.erase = true;
     }
 
-    animation(3,5,&lif_anim,&lif_anim_mov,true);
+    Funcs::animation(3,5,&lif_anim,&lif_anim_mov,true);
 
     if(last_lives - lives != 0){
         if((lives - last_lives) > 0){
-            if (animation(0,2,&lif_new_anim,&lif_new_anim_mov,false))
+            if (Funcs::animation(0,2,&lif_new_anim,&lif_new_anim_mov,false))
             {
                 last_lives = lives;
             }
         }
         else{
-            if (animation(6,8,&lif_new_anim,&lif_new_anim_mov,false))
+            if (Funcs::animation(6,8,&lif_new_anim,&lif_new_anim_mov,false))
             {
                 last_lives = lives;
             }
@@ -81,9 +94,18 @@ void Player::animate(){
 }
 
 void Player::move(){
-    int realSpeed = (state.buffed) ? speed*2 : speed;
+    int realSpeed = (state.fast) ? speed*2 : speed;
     realSpeed = (state.slowed) ? realSpeed/2 : realSpeed;
+
     updateState();
+    if (state.buffed){
+        damage = 5;
+    }else
+    {
+        damage = 1;
+    }
+    
+
     if (movState[0]){
         x -= realSpeed;
     }
@@ -95,7 +117,10 @@ void Player::move(){
 }
 
 void Player::shot(int lost, int type){
-    Objects::shot(lost,type);
+    if (!state.fortifyed){
+        Objects::shot(lost,type);
+    }
+    
     if (lives > 0){
         state.invulnerable = true;
         state.timer.invulnerable = time(NULL) + 3; //3 seconds of invulnerability
@@ -112,8 +137,10 @@ void Player::buff(int type){
     switch (type)
     {
     case 0:
-        state.buffed = true;
-        state.timer.buffed = time(0) + 10;
+        state.invulnerable = true;
+        state.timer.invulnerable = time(0) + 10;
+        state.fast = true;
+        state.timer.fast = time(0) + 10;
         break;
     
     case 1:
@@ -124,16 +151,22 @@ void Player::buff(int type){
         break;
 
     case 2:
-        state.invulnerable = true;
-        state.timer.invulnerable = time(0) + 10;
         state.buffed = true;
         state.timer.buffed = time(0) + 10;
         break;
+    }
+    if(lives > max_lives){
+        state.fortifyed = true;
+        lives = max_lives;
     }
 }
 
 int Player::getType(){
     return type;
+}
+
+int Player::getDamage(){
+    return damage;
 }
 
 void Player::draw(){

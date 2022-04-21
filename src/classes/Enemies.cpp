@@ -1,4 +1,9 @@
 #include "Enemies.h"
+#include "Funcs.h"
+#include "Bullets.h"
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro5.h>
+#include <cmath>
 
 Enemies::Enemies(int xstart, int ystart, int type, double diff) : Objects(xstart, ystart)
 {
@@ -8,7 +13,7 @@ Enemies::Enemies(int xstart, int ystart, int type, double diff) : Objects(xstart
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_set_path_filename(path, pl_skins[type].c_str());
     spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
-    speed = 10 + ceil(10 * diff);
+    speed = 10 + std::ceil(10 * diff);
 }
 
 Enemies::~Enemies()
@@ -24,15 +29,15 @@ Bullets *Enemies::shoot()
 void Enemies::animate()
 {
     if (!state.alive){
-        animation(5,7,&anim,&anim_mov,false);
+        Funcs::animation(5,7,&anim,&anim_mov,false);
     }
     else{
         if (lives == 2)
         {
-            animation(8,10,&anim,&anim_mov,false);
+            Funcs::animation(8,10,&anim,&anim_mov,false);
         }
         else{
-            animation(0,2,&anim,&anim_mov,true);   
+            Funcs::animation(0,2,&anim,&anim_mov,true);   
         }
     }
 
@@ -49,7 +54,7 @@ bool Enemies::move(int n_left)
 {
     if (moving_right)
     {
-        x = ((ceil(speed / n_left)) > 30) ? x + 30 + ceil(speed / 10) : x + ceil(speed / n_left) + ceil(speed / 10);
+        x = ((std::ceil(speed / n_left)) > 30) ? x + 30 + ceil(speed / 10) : x + ceil(speed / n_left) + ceil(speed / 10);
         if (x > WIDTH - size[0] - 60)
         {
             return true;

@@ -1,4 +1,13 @@
 #include "Game.h"
+#include "Funcs.h"
+#include "Player.h"
+#include "Bosses.h"
+#include "Enemies.h"
+#include <iostream>
+#include <cmath>
+#include <list>
+#include <cstring>
+#include <allegro5/allegro5.h>
 
 Game::Game(int diff, int mod, int pl_type)
 {
@@ -11,8 +20,8 @@ Game::Game(int diff, int mod, int pl_type)
     score = 0;
     wave = 0;
     player = new Player(pl_type);
-    score_buffs[0] = ceil(difficulty * 2500);
-    score_buffs[1] = ceil(difficulty * 10000);
+    score_buffs[0] = std::ceil(difficulty * 2500);
+    score_buffs[1] = std::ceil(difficulty * 10000);
 }
 
 Game::~Game()
@@ -36,15 +45,18 @@ void Game::createEnemies(int x_n, int y_n)
 
     wave++;
 
-    for (Bosses *const &n : bossesAvailable){
-        if (n->isMegaboss()){
+    for (Bosses *const &n : bossesAvailable)
+    {
+        if (n->isMegaboss())
+        {
             mega_boss = true;
         }
     }
 
     if (/*wave % 5 == 0 &&*/ bossesAvailable.size() <= 2)
     {
-        if(!mega_boss){
+        if (!mega_boss)
+        {
             bossesAvailable.push_back(new Bosses(rand() % 3, difficulty, true));
         }
         bossesAvailable.push_back(new Bosses(rand() % 3, difficulty));
@@ -76,18 +88,18 @@ void Game::collisionHandler()
     {
         for (Enemies *const &m : enemiesAvailable)
         {
-            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
                 hit = true;
-                m->shot();
+                m->shot(player->getDamage());
             };
         }
         for (Bosses *const &m : bossesAvailable)
         {
-            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
                 hit = true;
-                m->shot();
+                m->shot(player->getDamage());
             };
         }
         if (hit)
@@ -99,7 +111,7 @@ void Game::collisionHandler()
 
     for (Bullets *const &n : bulletsEnemies)
     {
-        if (verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable)
+        if (Funcs::verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable)
         {
             n->collide();
             player->shot();
@@ -110,7 +122,7 @@ void Game::collisionHandler()
 
     for (Enemies *const &n : enemiesAvailable)
     {
-        if (verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable && n->getState().alive)
+        if (Funcs::verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable && n->getState().alive)
         {
             player->shot(10);
             score = (score <= 100) ? 0 : score - 100;
@@ -126,7 +138,7 @@ void Game::collisionHandler()
             area[2] = n->getSize()[2] - n->getShotGap();
             area[3] = HEIGHT;
 
-            if (verifyCollision(area, player->getSize()) && player->getState().alive && !player->getState().invulnerable)
+            if (Funcs::verifyCollision(area, player->getSize()) && player->getState().alive && !player->getState().invulnerable)
             {
                 switch (n->getType())
                 {
@@ -149,7 +161,7 @@ void Game::collisionHandler()
             {
                 for (Enemies *const &m : enemiesAvailable)
                 {
-                    if (verifyCollision(area, m->getSize()))
+                    if (Funcs::verifyCollision(area, m->getSize()))
                     {
                         m->fortify();
                     }
@@ -209,11 +221,11 @@ int Game::moveEntities()
         }
         if (bossesAvailable.size() == 0)
         {
-            probability = (difficulty <= 6) ? rand() % (int)floor(600 / difficulty) : rand() % (int)floor(600 / 6);
+            probability = (difficulty <= 6) ? rand() % (int)std::floor(600 / difficulty) : rand() % (int)std::floor(600 / 6);
         }
         else
         {
-            probability = (difficulty <= 6) ? rand() % (int)floor(1200 / difficulty) : rand() % (int)floor(1200 / 6);
+            probability = (difficulty <= 6) ? rand() % (int)std::floor(1200 / difficulty) : rand() % (int)std::floor(1200 / 6);
         }
         if (probability == 0 && (*n_enemies)->getSize()[1] > 0)
         {
@@ -223,7 +235,7 @@ int Game::moveEntities()
         {
             if ((*n_enemies)->getState().erase)
             {
-                score += ceil(10 * difficulty);
+                score += std::ceil(10 * difficulty);
             }
             delete (*n_enemies);
             n_enemies = enemiesAvailable.erase(n_enemies);
@@ -246,14 +258,14 @@ int Game::moveEntities()
     while (n_bosses != bossesAvailable.end())
     {
         (*n_bosses)->move();
-        probability = (difficulty <= 6) ? rand() % (int)floor(300 / difficulty) : rand() % (int)floor(300 / 6);
+        probability = (difficulty <= 6) ? rand() % (int)std::floor(300 / difficulty) : rand() % (int)std::floor(300 / 6);
         if (probability == 0 && (*n_bosses)->getSize()[0] > 0)
         {
             bulletsEnemies.push_back((*n_bosses)->shootNormal());
         };
         if ((*n_bosses)->getState().erase)
         {
-            score = ((*n_bosses)->isMegaboss()) ? score + ceil(10000 * difficulty) : score + ceil(1000 * difficulty);
+            score = ((*n_bosses)->isMegaboss()) ? score + std::ceil(10000 * difficulty) : score + std::ceil(1000 * difficulty);
             player->buff((*n_bosses)->getType());
             delete (*n_bosses);
             n_bosses = bossesAvailable.erase(n_bosses);
@@ -267,11 +279,11 @@ int Game::moveEntities()
     if (score > score_buffs[0])
     {
         player->buff(1);
-        score_buffs[0] += ceil(2500 * difficulty);
+        score_buffs[0] += std::ceil(2500 * difficulty);
         if (score > score_buffs[1])
         {
             player->buff(2);
-            score_buffs[1] += ceil(10000 * difficulty);
+            score_buffs[1] += std::ceil(10000 * difficulty);
         }
     }
 
@@ -329,35 +341,31 @@ void Game::playerMovement(ALLEGRO_EVENT event)
         switch (event.type)
         {
         case ALLEGRO_EVENT_KEY_DOWN:
-            switch (event.keyboard.keycode)
+            if (event.keyboard.keycode == ALLEGRO_KEY_A || event.keyboard.keycode == ALLEGRO_KEY_LEFT)
             {
-            case ALLEGRO_KEY_A:
                 player->changeMove(true, 0);
-                break;
-
-            case ALLEGRO_KEY_D:
+            }
+            else if (event.keyboard.keycode == ALLEGRO_KEY_D || event.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+            {
                 player->changeMove(true, 1);
-                break;
-
-            case ALLEGRO_KEY_L:
+            }
+            else if (event.keyboard.keycode == ALLEGRO_KEY_L || event.keyboard.keycode == ALLEGRO_KEY_SPACE)
+            {
                 if (!player->getState().hacked)
                 {
                     bulletsAlly.push_back(player->shoot());
                 }
-                break;
             }
             break;
 
         case ALLEGRO_EVENT_KEY_UP:
-            switch (event.keyboard.keycode)
+            if (event.keyboard.keycode == ALLEGRO_KEY_A || event.keyboard.keycode == ALLEGRO_KEY_LEFT)
             {
-            case ALLEGRO_KEY_A:
                 player->changeMove(false, 0);
-                break;
-
-            case ALLEGRO_KEY_D:
+            }
+            else if (event.keyboard.keycode == ALLEGRO_KEY_D || event.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+            {
                 player->changeMove(false, 1);
-                break;
             }
             break;
         }

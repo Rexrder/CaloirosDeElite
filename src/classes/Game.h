@@ -1,4 +1,13 @@
-#include "Bosses.cpp"
+#include "Bosses.h"
+#include "Enemies.h"
+#include "Bullets.h"
+#include "Player.h"
+#include <list>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro5.h>
+
+#ifndef GAME_H
+#define GAME_H
 class Game
 {
 private:
@@ -27,3 +36,5 @@ public:
     void collisionHandler();
     void drawUI();
 };
+
+#endif

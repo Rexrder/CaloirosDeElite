@@ -1,4 +1,6 @@
 #include "Bullets.h"
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_image.h>
 
 Bullets::Bullets(int xstart, int ystart,bool player, int type) : Objects(xstart, ystart)
 {

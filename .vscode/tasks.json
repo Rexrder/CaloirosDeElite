@@ -5,11 +5,84 @@
             "label": "Testing",
             "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
             "args": [
-                "program.cpp",
+                "${file}",
+                "src\\classes\\Game.cpp",
+                "src\\classes\\Bosses.cpp",
+                "src\\classes\\Bullets.cpp",
+                "src\\classes\\Enemies.cpp",
+                "src\\classes\\Objects.cpp",
+                "src\\classes\\Player.cpp",
+                "src\\classes\\Funcs.cpp",
                 "-o",
                 "CaloirosDeElite.exe",
                 "my.res",
                 "-Bstatic",
+                "-lallegro",
+                "-lallegro_ttf",
+                "-lallegro_font",
+                "-lallegro_image",
+                "-lallegro_primitives",
+                "-lallegro_audio",
+                "-lallegro_acodec",
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tarea generada por el depurador."
+        },
+        {
+            "type": "cppbuild",
+            "label": "Building",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-c",
+                "program.cpp",
+                "src\\classes\\Game.cpp",
+                "src\\classes\\Bosses.cpp",
+                "src\\classes\\Bullets.cpp",
+                "src\\classes\\Enemies.cpp",
+                "src\\classes\\Objects.cpp",
+                "src\\classes\\Player.cpp",
+                "-lallegro",
+                "-lallegro_ttf",
+                "-lallegro_font",
+                "-lallegro_image",
+                "-lallegro_primitives",
+                "-lallegro_audio",
+                "-lallegro_acodec",
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tarea generada por el depurador."
+        },
+        {
+            "type": "cppbuild",
+            "label": "Link",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-c",
+                "program.cpp",
+                "src\\classes\\Game.cpp",
+                "src\\classes\\Bosses.cpp",
+                "src\\classes\\Bullets.cpp",
+                "src\\classes\\Enemies.cpp",
+                "src\\classes\\Objects.cpp",
+                "src\\classes\\Player.cpp",
                 "-lallegro",
                 "-lallegro_ttf",
                 "-lallegro_font",

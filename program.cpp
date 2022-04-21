@@ -1,5 +1,14 @@
 ﻿#include <stdbool.h>
-#include "src\classes\Game.cpp"
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_windows.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include "src\classes\Game.h"
+
 
 int main()
 {
@@ -41,7 +50,7 @@ int main()
     ALLEGRO_EVENT event;
 
     srand(time(0));
-    Game new_game(3,0);
+    Game new_game(2,0,2);
     
     al_attach_audio_stream_to_mixer(b_music, al_get_default_mixer());
     al_set_audio_stream_playing(b_music, true);

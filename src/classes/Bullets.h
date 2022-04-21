@@ -1,4 +1,7 @@
-#include "Objects.cpp"
+#include "Objects.h"
+
+#ifndef BULLETS_H
+#define BULLETS_H
 
 class Bullets: public Objects
 {
@@ -9,3 +12,5 @@ public:
     void draw();
     void collide();
 };
+
+#endif
