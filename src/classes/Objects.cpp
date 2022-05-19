@@ -65,4 +65,7 @@ void Objects::updateState(){
     if (state.timer.fast <= time(NULL) && state.fast){
         state.fast = false;
     }
+    if (state.timer.fortifyed <= time(NULL) && state.fortifyed){
+        state.fortifyed = false;
+    }
 }

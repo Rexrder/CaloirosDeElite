@@ -30,7 +30,7 @@ Player::Player(int pl_type, int max_l)
     sounds.buff = al_load_sample(al_path_cstr(path, '/'));
 
     speed = 15;
-    lives = 3;
+    lives = (max_l > 3) ? 3 : max_l;
     size[0] = 64;
     size[1] = 64;
 
@@ -58,14 +58,22 @@ void Player::animate(){
 
     if (!state.alive){
         Funcs::animation(5,7,&anim,&anim_mov,false);
-    }else
-    if (state.invulnerable){
+    }
+    else if (state.fast)
+    {
+        Funcs::animation(11,13,&anim,&anim_mov,true);
+    }
+    else if (state.invulnerable){
         Funcs::animation(3,4,&anim,&anim_mov,true);
     }
     else
-    if (state.buffed)
+    if (state.fortifyed)
     {
         Funcs::animation(8,10,&anim,&anim_mov,true);
+    }
+    else if (state.buffed)
+    {
+        Funcs::animation(14,16,&anim,&anim_mov,true);
     }
     else{
         Funcs::animation(0,2,&anim,&anim_mov,true);
@@ -97,6 +105,10 @@ void Player::move(){
     int realSpeed = (state.fast) ? speed*2 : speed;
     realSpeed = (state.slowed) ? realSpeed/2 : realSpeed;
 
+    y += y_speed;
+
+    state.erase = (y+size[1] < 0) ? true : state.erase;
+
     updateState();
     if (state.buffed){
         damage = 5;
@@ -120,7 +132,8 @@ void Player::shot(int lost, int type){
     if (!state.fortifyed){
         Objects::shot(lost,type);
     }
-    
+    state.fortifyed = false;
+
     if (lives > 0){
         state.invulnerable = true;
         state.timer.invulnerable = time(NULL) + 3; //3 seconds of invulnerability
@@ -157,6 +170,7 @@ void Player::buff(int type){
     }
     if(lives > max_lives){
         state.fortifyed = true;
+        state.timer.fortifyed = time(0) + 15;
         lives = max_lives;
     }
 }
@@ -167,6 +181,10 @@ int Player::getType(){
 
 int Player::getDamage(){
     return damage;
+}
+
+void Player::win(){
+    y_speed = (y_speed > -15) ? y_speed - 1 : -15;
 }
 
 void Player::draw(){

@@ -2,6 +2,7 @@
 #include "Enemies.h"
 #include "Bullets.h"
 #include "Player.h"
+#include "Bonus.h"
 #include <list>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro5.h>
@@ -15,6 +16,7 @@ private:
     std::list<Bullets *> bulletsAlly;
     std::list<Enemies *> enemiesAvailable;
     std::list<Bosses *> bossesAvailable;
+    std::list<Bonus *> bonusEntities;
 
     unsigned int score_buffs[2];
     bool enem_dir;
@@ -23,10 +25,14 @@ private:
     unsigned int score;
     int mode;
     int wave;
+    int level;
+    int enemy_it;
+    bool victory;
+    int counter_wave;
     ALLEGRO_FONT *font;
 
 public:
-    Game(int = 1, int = 0, int = 0);
+    Game(int mod = 0, int pl_type = 0, int level = 0);
     ~Game();
     void createEnemies(int, int);
     void animateEntities();
@@ -35,6 +41,7 @@ public:
     void playerMovement(ALLEGRO_EVENT event);
     void collisionHandler();
     void drawUI();
+    void restart(int mod = 0, int pl_type = 0, int level = 0);
 };
 
 #endif

@@ -20,6 +20,7 @@ struct SoundEffects
     ALLEGRO_SAMPLE *appear = NULL;
     ALLEGRO_SAMPLE *buff = NULL;
     ALLEGRO_SAMPLE *fast = NULL;
+    ALLEGRO_SAMPLE *fortifyed = NULL;
 };
 #endif
 
@@ -33,6 +34,7 @@ struct Timers
     std::time_t buffed = time(NULL);
     std::time_t hacked = time(NULL);
     std::time_t fast = time(NULL);
+    std::time_t fortifyed = time(NULL);
 };
 
 #endif
@@ -80,5 +82,4 @@ public:
     virtual void shot(int = 1, int = 0);
     void updateState();
 };
-
 #endif

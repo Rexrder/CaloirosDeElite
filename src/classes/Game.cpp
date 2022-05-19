@@ -3,25 +3,105 @@
 #include "Player.h"
 #include "Bosses.h"
 #include "Enemies.h"
+#include "Bonus.h"
 #include <iostream>
 #include <cmath>
 #include <list>
 #include <cstring>
 #include <allegro5/allegro5.h>
 
-Game::Game(int diff, int mod, int pl_type)
+Game::Game(int mod, int pl_type, int lev)
 {
+    int max_lifes;
+    victory = false;
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_set_path_filename(path, "/res/font.ttf");
     font = al_load_font(al_path_cstr(path, '/'), 25, 0);
-    difficulty = diff;
+    switch (mod)
+    {
+    case 0:
+        difficulty = 3.4;
+        max_lifes = 5;
+        break;
+
+    case 1:
+        difficulty = 1.6;
+        max_lifes = 5;
+        break;
+
+    case 2:
+        difficulty = 2.8;
+        max_lifes = 5;
+        break;
+
+    case 3:
+        difficulty = 4;
+        max_lifes = 5;
+        break;
+
+    case 4:
+        difficulty = 4;
+        max_lifes = 1;
+        break;
+    }
     enem_dir = false;
     mode = mod;
+    level = lev;
     score = 0;
     wave = 0;
-    player = new Player(pl_type);
+    counter_wave = 5;
+    enemy_it = 0;
+    player = new Player(pl_type, max_lifes);
     score_buffs[0] = std::ceil(difficulty * 2500);
     score_buffs[1] = std::ceil(difficulty * 10000);
+}
+
+void Game::restart(int mod, int pl_type, int lev)
+{
+    int max_lifes;
+    victory = false;
+    switch (mod)
+    {
+    case 0:
+        difficulty = 3.4;
+        max_lifes = 5;
+        break;
+
+    case 1:
+        difficulty = 1.6;
+        max_lifes = 5;
+        break;
+
+    case 2:
+        difficulty = 2.8;
+        max_lifes = 5;
+        break;
+
+    case 3:
+        difficulty = 4;
+        max_lifes = 5;
+        break;
+
+    case 4:
+        difficulty = 4;
+        max_lifes = 1;
+        break;
+    }
+    enem_dir = false;
+    mode = mod;
+    level = lev;
+    score = 0;
+    wave = 0;
+    counter_wave = 5;
+    enemy_it = 0;
+    player = new Player(pl_type, max_lifes);
+    score_buffs[0] = std::ceil(difficulty * 2500);
+    score_buffs[1] = std::ceil(difficulty * 10000);
+    bulletsEnemies.clear();
+    bulletsAlly.clear();
+    enemiesAvailable.clear();
+    bossesAvailable.clear();
+    bonusEntities.clear();
 }
 
 Game::~Game()
@@ -53,13 +133,53 @@ void Game::createEnemies(int x_n, int y_n)
         }
     }
 
-    if (/*wave % 5 == 0 &&*/ bossesAvailable.size() <= 2)
+    counter_wave = (bossesAvailable.size() == 0 || (bossesAvailable.size() == 1 && mega_boss)) ? counter_wave + 1 : 0;
+
+    if (mode == 0)
     {
-        if (!mega_boss)
-        {
-            bossesAvailable.push_back(new Bosses(rand() % 3, difficulty, true));
+        if(rand() % 20 == 0){
+            bonusEntities.push_back(new Bonus(difficulty));
         }
-        bossesAvailable.push_back(new Bosses(rand() % 3, difficulty));
+
+        if (bossesAvailable.size() <= 2)
+        {
+            if (!mega_boss)
+            {
+                bossesAvailable.push_back(new Bosses(rand() % 3, difficulty, true));
+            }
+            bossesAvailable.push_back(new Bosses(rand() % 3, difficulty));
+        }
+    }
+    else if (bossesAvailable.size() <= 2)
+    {
+        switch (level)
+        {
+        case 0:
+            if (counter_wave >= 3)
+            {
+                bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
+                enemy_it++;
+            }
+            break;
+        case 1:
+            if (counter_wave >= 2)
+            {
+                bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
+                enemy_it++;
+            }
+            break;
+        case 2:
+            if (wave == 1)
+            {
+                bossesAvailable.push_back(new Bosses(2, difficulty, true));
+            }
+            if (counter_wave >= 2)
+            {
+                bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
+                enemy_it = (enemy_it == 0) ? 1 : 0;
+            }
+            break;
+        }
     }
 
     for (int i = 0; i < x_n; i++)
@@ -95,6 +215,14 @@ void Game::collisionHandler()
             };
         }
         for (Bosses *const &m : bossesAvailable)
+        {
+            if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            {
+                hit = true;
+                m->shot(player->getDamage());
+            };
+        }
+        for (Bonus *const &m : bonusEntities)
         {
             if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
@@ -175,7 +303,7 @@ int Game::moveEntities()
 {
     int probability;
 
-    auto n_bullets = bulletsEnemies.begin();
+    std::list<Bullets*>::iterator n_bullets = bulletsEnemies.begin();
     while (n_bullets != bulletsEnemies.end())
     {
         (*n_bullets)->move();
@@ -206,13 +334,18 @@ int Game::moveEntities()
         }
     }
 
-    if (enemiesAvailable.size() == 0)
+    if (enemiesAvailable.size() == 0 && !victory)
     {
         difficulty += 0.2;
         createEnemies(10, 10);
     }
 
-    auto n_enemies = enemiesAvailable.begin();
+    if (enemiesAvailable.size() == 0 && bossesAvailable.size() == 0 && bulletsEnemies.size() == 0 && victory)
+    {
+        player->win();
+    }
+
+    std::list<Enemies*>::iterator n_enemies = enemiesAvailable.begin();
     while (n_enemies != enemiesAvailable.end())
     {
         if ((*n_enemies)->move(enemiesAvailable.size()))
@@ -254,7 +387,26 @@ int Game::moveEntities()
         enem_dir = false;
     }
 
-    auto n_bosses = bossesAvailable.begin();
+    std::list<Bonus*>::iterator n_bonus = bonusEntities.begin();
+    while (n_bonus != bonusEntities.end())
+    {
+        (*n_bonus)->move();
+        if ((*n_bonus)->getSize()[0] > WIDTH || (*n_bonus)->getState().erase)
+        {
+            if ((*n_bonus)->getState().erase)
+            {
+                score += std::ceil(2500 * difficulty);
+            }
+            delete (*n_bonus);
+            n_bonus = bonusEntities.erase(n_bonus);
+        }
+        else
+        {
+            ++n_bonus;
+        }
+    }
+
+    std::list<Bosses*>::iterator n_bosses = bossesAvailable.begin();
     while (n_bosses != bossesAvailable.end())
     {
         (*n_bosses)->move();
@@ -266,6 +418,13 @@ int Game::moveEntities()
         if ((*n_bosses)->getState().erase)
         {
             score = ((*n_bosses)->isMegaboss()) ? score + std::ceil(10000 * difficulty) : score + std::ceil(1000 * difficulty);
+            if (mode != 0)
+            {
+                if ((*n_bosses)->getType() == 2)
+                {
+                    victory = true;
+                }
+            }
             player->buff((*n_bosses)->getType());
             delete (*n_bosses);
             n_bosses = bossesAvailable.erase(n_bosses);
@@ -276,14 +435,17 @@ int Game::moveEntities()
         }
     }
 
-    if (score > score_buffs[0])
+    if (mode == 0)
     {
-        player->buff(1);
-        score_buffs[0] += std::ceil(2500 * difficulty);
-        if (score > score_buffs[1])
+        if (score > score_buffs[0])
         {
-            player->buff(2);
-            score_buffs[1] += std::ceil(10000 * difficulty);
+            player->buff(1);
+            score_buffs[0] += std::ceil(2500 * difficulty);
+            if (score > score_buffs[1])
+            {
+                player->buff(2);
+                score_buffs[1] += std::ceil(10000 * difficulty);
+            }
         }
     }
 
@@ -306,6 +468,10 @@ void Game::animateEntities()
     {
         n->animate();
     }
+    for (Bonus *const &n : bonusEntities)
+    {
+        n->animate();
+    }
 }
 
 void Game::drawEntities()
@@ -323,6 +489,11 @@ void Game::drawEntities()
     }
 
     for (Bosses *const &n : bossesAvailable)
+    {
+        n->draw();
+    }
+
+    for (Bonus *const &n : bonusEntities)
     {
         n->draw();
     }

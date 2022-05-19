@@ -187,7 +187,7 @@ void Bosses::changeMove()
 void Bosses::draw()
 {
     int vertical_origin = (type == 1) ? 0 : y + size[1] - 40;
-    int life_bar = std::ceil((WIDTH - 10)*(lives / original_lives));
+    int life_bar = std::ceil((WIDTH - 20)*(lives / original_lives));
     life_bar = (life_bar < 0) ? 0 : life_bar;
 
     if (state.buffed && anim >= 5 && anim <= 8)
@@ -199,6 +199,6 @@ void Bosses::draw()
     if(mega_boss){
         std::string boss_str="BOSS LIFE";
         al_draw_text(font_boss, al_map_rgb(255, 255, 255), 10, 25, ALLEGRO_ALIGN_LEFT, boss_str.c_str());
-        al_draw_filled_rectangle(10, 35, ceil((WIDTH - 10)*(lives / original_lives)),50, al_map_rgb(color[0],color[1],color[2]));
+        al_draw_filled_rectangle(10, 35, life_bar+10 ,50, al_map_rgb(color[0],color[1],color[2]));
     }
 };

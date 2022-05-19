@@ -7,7 +7,7 @@ public:
     Funcs(/* args */);
     ~Funcs();
     static bool verifyCollision(int*, int*);
-    static bool animation(int, int, int*, int*, bool);
+    static bool animation(int start, int end, int*, int*, bool ping_pong);
 };
 
 #endif

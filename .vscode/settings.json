@@ -51,5 +51,6 @@
         "cstring": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
-    "C_Cpp.intelliSenseEngineFallback": "Enabled"
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "altervista-thesaurus.lang": "en_US"
 }

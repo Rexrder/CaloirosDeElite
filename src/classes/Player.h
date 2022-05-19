@@ -20,6 +20,7 @@ private:
     int last_lives = 0;
     int damage = 1;
     int max_lives;
+    int y_speed = 0;
     ALLEGRO_BITMAP *spritesheet_life;
 public:
     Player(int = 0, int = 5);
@@ -32,6 +33,7 @@ public:
     Bullets* shoot();
     void changeMove(bool state, int pos);
     void shot(int = 1,int = 0) override;
+    void win();
     int getDamage();
 };
 
