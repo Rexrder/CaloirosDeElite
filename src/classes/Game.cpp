@@ -9,6 +9,7 @@
 #include <list>
 #include <cstring>
 #include <allegro5/allegro5.h>
+#include <allegro5/allegro_font.h>
 
 Game::Game(int mod, int pl_type, int lev)
 {

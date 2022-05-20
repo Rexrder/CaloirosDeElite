@@ -8,12 +8,13 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include "src\classes\Game.h"
+#include "src\classes\Menu.h"
 
 int main()
 {
     FreeConsole(); // Avoid console apearance on execution
     bool end = false;
-    bool playing = true;
+    bool playing = false;
 
     // ALLEGRO's modules initialization
 
@@ -63,6 +64,7 @@ int main()
 
     srand(time(0));         // random seed based on time
     Game new_game(0, 0, 2); // game creation
+    Menu menu;
 
     // Audio last settings
 
@@ -89,13 +91,16 @@ int main()
                 {
                     new_game.animateEntities(); // entities animation
                 }
+                else{
+                    menu.animate();
+                }
             }
             else
             {
                 if (playing)
                 {
                     new_game.collisionHandler();   // collisions handling
-                    end = new_game.moveEntities(); // entities movement
+                    playing = !new_game.moveEntities(); // entities movement
                 }
                 redraw = true;
             }
@@ -107,8 +112,10 @@ int main()
                 if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                 {
                     playing = false;
-                    end = true;
                 }
+            }
+            else{
+                playing = menu.setstate(event,new_game,end);
             }
             break;
 
@@ -121,9 +128,6 @@ int main()
         {
             new_game.playerMovement(event); // player movement
         }
-        else
-        {
-        }
 
         if (redraw && al_is_event_queue_empty(queue))
         {
@@ -134,6 +138,7 @@ int main()
             }
             else
             {
+                menu.draw();
             }
             al_flip_display();
 
