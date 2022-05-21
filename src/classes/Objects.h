@@ -24,6 +24,15 @@ struct SoundEffects
 };
 #endif
 
+#ifndef HIGHSCORESTAT_H
+#define HIGHSCORESTAT_H
+struct HighscrStat
+{
+    std::string player;
+    int score;
+};
+#endif
+
 #ifndef TIMERS_H
 #define TIMERS_H
 struct Timers

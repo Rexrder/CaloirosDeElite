@@ -20,14 +20,16 @@ public:
 
 private:
     int opt[2];
-    int selects[23][2] = {{1,5},{6,8},{0,-1},{0,-1},{9,10},{0,-1},{11,13},{18,20},{0,-1},{21,22},{0,-1},{14,17}};
+    int selects[23][2] = {{1,5},{6,8},{2,2},{0,-1},{9,10},{0,-1},{11,13},{18,20},{0,-1},{21,22},{0,-1},{14,17},{14,17},{14,17}};
 
     ALLEGRO_FONT *font;
     ALLEGRO_FONT *font_title;
-    ALLEGRO_USTR *player_name;
+    std::string player_name;
+    std::list<std::string> highsc_list;
 
     int player_type;
     int slot;
+    int slots[3][2];
 
     std::string options[23]= {"MAIN MENU","PLAY","HIGH SCORES","TROPHIES","SETTINGS","CREDITS","NEW GAME","LOAD GAME","ENDLESS","CUSTOMIZATION","TECHNICAL SETTINGS","SLOT 1","SLOT 2","SLOT 3","EASY","NORMAL","HARD","HARDCORE","SLOT 1","SLOT 2", "SLOT 3","EEIC", "EGSI"};
 

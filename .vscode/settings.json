@@ -48,7 +48,8 @@
         "typeinfo": "cpp",
         "list": "cpp",
         "ctime": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "fstream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "C_Cpp.intelliSenseEngineFallback": "Enabled",

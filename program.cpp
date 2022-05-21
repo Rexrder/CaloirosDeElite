@@ -12,7 +12,7 @@
 
 int main()
 {
-    FreeConsole(); // Avoid console apearance on execution
+    //FreeConsole(); // Avoid console apearance on execution
     bool end = false;
     bool playing = false;
 
@@ -63,7 +63,7 @@ int main()
     ALLEGRO_EVENT event;
 
     srand(time(0));         // random seed based on time
-    Game new_game(0, 0, 2); // game creation
+    Game new_game; // game creation
     Menu menu;
 
     // Audio last settings
@@ -82,6 +82,15 @@ int main()
     {
         al_wait_for_event(queue, &event);
 
+        if (playing)
+        {
+            new_game.playerMovement(event); // player movement
+        }
+        else
+        {
+            playing = menu.setstate(event, new_game, end);
+        }
+
         switch (event.type)
         {
         case ALLEGRO_EVENT_TIMER:
@@ -91,7 +100,8 @@ int main()
                 {
                     new_game.animateEntities(); // entities animation
                 }
-                else{
+                else
+                {
                     menu.animate();
                 }
             }
@@ -99,8 +109,13 @@ int main()
             {
                 if (playing)
                 {
-                    new_game.collisionHandler();   // collisions handling
-                    playing = !new_game.moveEntities(); // entities movement
+                    new_game.collisionHandler();        // collisions handling
+                    if (new_game.moveEntities())        // entities movement
+                    {
+                        playing = false;
+                        new_game.saveLoad();
+                        menu.restart();
+                    }
                 }
                 redraw = true;
             }
@@ -114,19 +129,11 @@ int main()
                     playing = false;
                 }
             }
-            else{
-                playing = menu.setstate(event,new_game,end);
-            }
             break;
 
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
             end = true;
             break;
-        }
-
-        if (playing)
-        {
-            new_game.playerMovement(event); // player movement
         }
 
         if (redraw && al_is_event_queue_empty(queue))
@@ -144,9 +151,9 @@ int main()
 
             redraw = false;
         }
-        
     }
     new_game.~Game(); // game destruction
+    menu.~Menu();
 
     // Allegro elements destruction (free memory)
 

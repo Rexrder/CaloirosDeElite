@@ -59,3 +59,7 @@ void rangeDef(int &val, int* rang){
         val = rang[0];
     }    
 };
+
+bool compareHighs(const HighscrStat& first, const HighscrStat& second){
+    return (first.score > second.score);
+};

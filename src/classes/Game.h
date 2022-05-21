@@ -21,27 +21,31 @@ private:
     unsigned int score_buffs[2];
     bool enem_dir;
     double difficulty;
+    std::string player_name;
     Player *player;
     unsigned int score;
     int mode;
+    int slot;
     int wave;
     int level;
+    int enemies_killed[4] = {0,0,0,0};
     int enemy_it;
     bool victory;
     int counter_wave;
     ALLEGRO_FONT *font;
 
 public:
-    Game(int mod = 0, int pl_type = 0, int level = 0);
+    Game();
     ~Game();
     void createEnemies(int, int);
     void animateEntities();
-    int moveEntities();
+    bool moveEntities();
     void drawEntities();
     void playerMovement(ALLEGRO_EVENT event);
     void collisionHandler();
     void drawUI();
-    void restart(int mod = 0, int pl_type = 0, int level = 0);
+    void restart(int mod = 0, int pl_type = 0, int level = 0, int slot = 0, std::string player_n = "");
+    void saveLoad();
 };
 
 #endif
