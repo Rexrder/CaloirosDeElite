@@ -1,13 +1,7 @@
-#ifndef FUNCS_H
-#define FUNCS_H
+#ifndef FUNCS
+#define FUNCS
 
-class Funcs
-{
-public:
-    Funcs(/* args */);
-    ~Funcs();
-    static bool verifyCollision(int*, int*);
-    static bool animation(int start, int end, int*, int*, bool ping_pong);
-};
-
+bool verifyCollision(int*, int*);
+bool animation(int start, int end, int&, int&, bool ping_pong);
+void rangeDef(int &val, int* rang);
 #endif

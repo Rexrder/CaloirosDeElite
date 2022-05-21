@@ -27,11 +27,11 @@ void Bonus::animate()
 {
     if (!state.alive)
     {
-        Funcs::animation(3, 5, &anim, &anim_mov, false);
+        animation(3, 5, anim, anim_mov, false);
     }
     else
     {
-        Funcs::animation(0, 2, &anim, &anim_mov, true);
+        animation(0, 2, anim, anim_mov, true);
     }
     if (anim == 5)
     {

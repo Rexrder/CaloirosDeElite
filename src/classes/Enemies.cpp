@@ -28,25 +28,30 @@ Bullets *Enemies::shoot()
 
 void Enemies::animate()
 {
-    if (!state.alive){
-        Funcs::animation(5,7,&anim,&anim_mov,false);
+    if (!state.alive)
+    {
+        animation(5, 7, anim, anim_mov, false);
     }
-    else{
+    else
+    {
         if (lives == 2)
         {
-            Funcs::animation(8,10,&anim,&anim_mov,false);
+            animation(8, 10, anim, anim_mov, false);
         }
-        else{
-            Funcs::animation(0,2,&anim,&anim_mov,true);   
+        else
+        {
+            animation(0, 2, anim, anim_mov, true);
         }
     }
 
-    if (anim == 7){
+    if (anim == 7)
+    {
         state.erase = true;
     }
 }
 
-void Enemies::fortify(){
+void Enemies::fortify()
+{
     lives = 2;
 }
 

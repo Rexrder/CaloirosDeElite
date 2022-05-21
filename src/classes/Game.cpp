@@ -209,7 +209,7 @@ void Game::collisionHandler()
     {
         for (Enemies *const &m : enemiesAvailable)
         {
-            if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
                 hit = true;
                 m->shot(player->getDamage());
@@ -217,7 +217,7 @@ void Game::collisionHandler()
         }
         for (Bosses *const &m : bossesAvailable)
         {
-            if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
                 hit = true;
                 m->shot(player->getDamage());
@@ -225,7 +225,7 @@ void Game::collisionHandler()
         }
         for (Bonus *const &m : bonusEntities)
         {
-            if (Funcs::verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
+            if (verifyCollision(n->getSize(), m->getSize()) && m->getState().alive)
             {
                 hit = true;
                 m->shot(player->getDamage());
@@ -240,7 +240,7 @@ void Game::collisionHandler()
 
     for (Bullets *const &n : bulletsEnemies)
     {
-        if (Funcs::verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable)
+        if (verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable)
         {
             n->collide();
             player->shot();
@@ -251,7 +251,7 @@ void Game::collisionHandler()
 
     for (Enemies *const &n : enemiesAvailable)
     {
-        if (Funcs::verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable && n->getState().alive)
+        if (verifyCollision(n->getSize(), player->getSize()) && player->getState().alive && !player->getState().invulnerable && n->getState().alive)
         {
             player->shot(10);
             score = (score <= 100) ? 0 : score - 100;
@@ -267,7 +267,7 @@ void Game::collisionHandler()
             area[2] = n->getSize()[2] - n->getShotGap();
             area[3] = HEIGHT;
 
-            if (Funcs::verifyCollision(area, player->getSize()) && player->getState().alive && !player->getState().invulnerable)
+            if (verifyCollision(area, player->getSize()) && player->getState().alive && !player->getState().invulnerable)
             {
                 switch (n->getType())
                 {
@@ -290,7 +290,7 @@ void Game::collisionHandler()
             {
                 for (Enemies *const &m : enemiesAvailable)
                 {
-                    if (Funcs::verifyCollision(area, m->getSize()))
+                    if (verifyCollision(area, m->getSize()))
                     {
                         m->fortify();
                     }

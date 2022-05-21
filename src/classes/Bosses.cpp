@@ -12,14 +12,13 @@
 #include <cstring>
 #include <iostream>
 
-
 Bosses::Bosses(int typ, double diff, bool m_b)
 {
     difficulty = diff;
     type = typ;
     mega_boss = m_b;
     x = (mega_boss) ? WIDTH + 200 : -200;
-    y = 300 - 64*type;
+    y = 300 - 64 * type;
 
     size[0] = 128;
     size[1] = 126;
@@ -93,11 +92,13 @@ int Bosses::getType()
     return type;
 }
 
-int Bosses::getShotGap(){
+int Bosses::getShotGap()
+{
     return shot_gap;
 }
 
-bool Bosses::isMegaboss(){
+bool Bosses::isMegaboss()
+{
     return mega_boss;
 }
 
@@ -137,23 +138,23 @@ void Bosses::animate()
 {
     if (!state.alive)
     {
-        Funcs::animation(12, 14, &anim, &anim_mov, false);
+        animation(12, 14, anim, anim_mov, false);
     }
     else if (state.buffed)
     {
-        state.buffed = !Funcs::animation(5, 8, &anim, &anim_mov, true);
+        state.buffed = !animation(5, 8, anim, anim_mov, true);
     }
     else if (state.slowed)
     {
-        Funcs::animation(9, 11, &anim, &anim_mov, true);
+        animation(9, 11, anim, anim_mov, true);
     }
     else if (state.invulnerable)
     {
-        state.invulnerable = !Funcs::animation(3, 4, &anim, &anim_mov, true);
+        state.invulnerable = !animation(3, 4, anim, anim_mov, true);
     }
     else
     {
-        Funcs::animation(0, 2, &anim, &anim_mov, true);
+        animation(0, 2, anim, anim_mov, true);
     }
 
     if (anim == 14)
@@ -187,7 +188,7 @@ void Bosses::changeMove()
 void Bosses::draw()
 {
     int vertical_origin = (type == 1) ? 0 : y + size[1] - 40;
-    int life_bar = std::ceil((WIDTH - 20)*(lives / original_lives));
+    int life_bar = std::ceil((WIDTH - 20) * (lives / original_lives));
     life_bar = (life_bar < 0) ? 0 : life_bar;
 
     if (state.buffed && anim >= 5 && anim <= 8)
@@ -196,9 +197,10 @@ void Bosses::draw()
     }
     al_draw_bitmap_region(spritesheet, size[0] * anim, 0, size[0], size[1], x, y, 0);
 
-    if(mega_boss){
-        std::string boss_str="BOSS LIFE";
+    if (mega_boss)
+    {
+        std::string boss_str = "BOSS LIFE";
         al_draw_text(font_boss, al_map_rgb(255, 255, 255), 10, 25, ALLEGRO_ALIGN_LEFT, boss_str.c_str());
-        al_draw_filled_rectangle(10, 35, life_bar+10 ,50, al_map_rgb(color[0],color[1],color[2]));
+        al_draw_filled_rectangle(10, 35, life_bar + 10, 50, al_map_rgb(color[0], color[1], color[2]));
     }
 };

@@ -20,10 +20,16 @@ public:
 
 private:
     int opt[2];
+    int selects[23][2] = {{1,5},{6,8},{0,-1},{0,-1},{9,10},{0,-1},{11,13},{18,20},{0,-1},{21,22},{0,-1},{14,17}};
+
     ALLEGRO_FONT *font;
     ALLEGRO_FONT *font_title;
+    ALLEGRO_USTR *player_name;
+
     int player_type;
-    std::string options[23]= {"MAIN MENU","PLAY","HIGH SCORES","TROPHIES","SETTINGS","CREDITS","NEW GAME","LOAD GAME","ENDLESS","CUSTOMIZATION","SETTINGS","SLOT 1","SLOT 2","SLOT 3","EASY","NORMAL","HARD","HARDCORE","SLOT 1","SLOT 2", "SLOT 3","EEIC", "EGSI"};
+    int slot;
+
+    std::string options[23]= {"MAIN MENU","PLAY","HIGH SCORES","TROPHIES","SETTINGS","CREDITS","NEW GAME","LOAD GAME","ENDLESS","CUSTOMIZATION","TECHNICAL SETTINGS","SLOT 1","SLOT 2","SLOT 3","EASY","NORMAL","HARD","HARDCORE","SLOT 1","SLOT 2", "SLOT 3","EEIC", "EGSI"};
 
 };
 

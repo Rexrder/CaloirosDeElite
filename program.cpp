@@ -144,6 +144,7 @@ int main()
 
             redraw = false;
         }
+        
     }
     new_game.~Game(); // game destruction
 
