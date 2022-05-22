@@ -634,13 +634,13 @@ void Game::saveLoad()
         std::ofstream save_o((".\\save.txt"));
         if (save_o.is_open())
         {
-            if (mode == 4)
+            if (mode == 4 || victory)
             {
                 slots[slot] = "";
             }
             else
             {
-                slots[slot] = (victory) ? std::to_string(mode) + " " + std::to_string(level + 1) : std::to_string(mode) + " " + std::to_string(level);
+                slots[slot] =  std::to_string(mode) + " " + std::to_string(level);
             }
             for (auto &n : slots)
             {
