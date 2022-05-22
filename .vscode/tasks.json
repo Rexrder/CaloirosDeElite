@@ -122,6 +122,7 @@
                 "src\\classes\\Objects.cpp",
                 "src\\classes\\Player.cpp",
                 "src\\classes\\Funcs.cpp",
+                "src\\classes\\Menu.cpp",
                 "-o",
                 "Caloiros.exe",
                 "my.res",

@@ -33,6 +33,7 @@ private:
     bool victory;
     int counter_wave;
     ALLEGRO_FONT *font;
+    ALLEGRO_BITMAP *spr_skins;
 
 public:
     Game();

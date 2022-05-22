@@ -71,7 +71,6 @@ struct State
 class Objects
 {
 protected:
-    std::string pl_skins[6]={"/res/eletrao.png","/res/egsi.png","/res/eciv.png","/res/epol.png","/res/etext.png","/res/emat.png"};
     State state;
     int x;
     int y;

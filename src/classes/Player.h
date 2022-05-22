@@ -23,7 +23,7 @@ private:
     int y_speed = 0;
     ALLEGRO_BITMAP *spritesheet_life;
 public:
-    Player(int = 0, int = 5);
+    Player(int, int, ALLEGRO_BITMAP* &spr);
     ~Player();
     void move();
     void draw();

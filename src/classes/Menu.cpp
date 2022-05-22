@@ -1,6 +1,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <string>
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include "Menu.h"
@@ -13,6 +14,14 @@ Menu::Menu()
     al_set_path_filename(path, "/res/font.ttf");
     font = al_load_font(al_path_cstr(path, '/'), 50, 0);
     font_title = al_load_font(al_path_cstr(path, '/'), 80, 0);
+
+    path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_set_path_filename(path, "/res/trophies.png");
+    spr_troph = al_load_bitmap(al_path_cstr(path, '/'));
+
+    path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_set_path_filename(path, "/res/skins.png");
+    spr_troph = al_load_bitmap(al_path_cstr(path, '/'));
 
     player_type = 0;
     player_name.clear();
@@ -110,7 +119,6 @@ bool Menu::setstate(ALLEGRO_EVENT event, Game &game, bool &end)
     case 8: // endless
         if (event.type == ALLEGRO_EVENT_KEY_CHAR && event.keyboard.keycode != ALLEGRO_KEY_BACKSPACE && event.keyboard.keycode != ALLEGRO_KEY_ENTER && player_name.size() < 20)
         {
-            std::cout << event.keyboard.unichar;
             player_name += ((char)event.keyboard.unichar);
         }
         break;
@@ -168,13 +176,52 @@ void Menu::restart()
     {
         while (std::getline(save_i, line))
         {
-            std::cout << line.front();
             slots[i][0] = (line.front() == (char)0) ? -1 : (int)(line.front() - 48);
             slots[i][1] = (line.front() == (char)0) ? -1 : (int)(line.back() - 48);
             i++;
         }
         save_i.close();
     }
+
+    i = 0;
+    std::ifstream stats_i((".\\stats.txt"));
+    if (stats_i.is_open())
+    {
+        while (std::getline(stats_i, line))
+        {
+            stats[i] = (line.empty()) ? 0 : std::stoi(line);
+            i++;
+        }
+        stats_i.close();
+    }
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        switch (i)
+        {
+        case 0:
+            unlock_t[i] = (stats[5] > 1) ? true : false;
+            break;
+
+        case 2:
+            unlock_t[i] = (stats[4] > 5) ? true : false;
+            break;
+
+        case 3:
+            unlock_t[i] = (stats[6] > 1) ? true : false;
+            break;
+
+        default:
+            unlock_t[i] = (stats[1] > 1) ? true : false;
+            break;
+        }
+    }
+
+    for (size_t i = 0; i < 6; i++)
+    {
+        unlock_sk[i] = (stats[5] > 5*(std::pow(2,i)-5)) ? true : false;
+    }
+    
 }
 
 void Menu::draw()
@@ -192,13 +239,28 @@ void Menu::draw()
         break;
 
     case 2:
-
         for (auto &n : highsc_list)
         {
             al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 + (80 * b) - (40 * (highsc_list.size() - 1)) + 40, ALLEGRO_ALIGN_CENTER, n.c_str());
             b++;
         }
         break;
+    case 5:
+        al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 - 40, ALLEGRO_ALIGN_CENTER, "GAME DESIGN AND DEVELOPMENT");
+        al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 + 40, ALLEGRO_ALIGN_CENTER, "CHRISTIAN LEONARD & AFONSO GOMES");
+        break;
+    case 3:
+        for (size_t i = 0; i < 6; i++)
+        {
+            if (unlock_t[i])
+            {
+                al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 - 120 + 80*i, ALLEGRO_ALIGN_LEFT, trophies[i].c_str());
+                al_draw_bitmap_region(spr_troph,384*i+anim*64,0,64,64,30,HEIGHT / 2 - 120 + 80*i,0);
+            }else{
+                al_draw_bitmap_region(spr_troph,384*i+anim*64 + 192,0,64,64,30,HEIGHT / 2 - 120 + 80*i,0);
+            }
+        }
+        
     default:
         for (int i = selects[opt[0]][0]; i <= selects[opt[0]][1]; i++)
         {
@@ -218,6 +280,7 @@ void Menu::draw()
 
 void Menu::animate()
 {
+    animation(0, 1, anim, anim_mov, true);
 }
 
 Menu::~Menu()

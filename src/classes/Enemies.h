@@ -7,8 +7,9 @@ class Enemies: public Objects
 {
 private:
     bool moving_right = true;
+    int type;
 public:
-    Enemies(int xstart, int ystart, int type, double diff);
+    Enemies(int xstart, int ystart, int type, double diff, ALLEGRO_BITMAP* &spr);
     ~Enemies();
     bool move(int n_left);
     void draw();

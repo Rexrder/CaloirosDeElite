@@ -5,20 +5,18 @@
 #include <allegro5/allegro5.h>
 #include <cmath>
 
-Enemies::Enemies(int xstart, int ystart, int type, double diff) : Objects(xstart, ystart)
+Enemies::Enemies(int xstart, int ystart, int type, double diff, ALLEGRO_BITMAP* &spr) : Objects(xstart, ystart)
 {
     size[0] = 64;
     size[1] = 64;
 
-    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-    al_set_path_filename(path, pl_skins[type].c_str());
-    spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
+    spritesheet = spr;
     speed = 10 + std::ceil(10 * diff);
+    this->type = type;
 }
 
 Enemies::~Enemies()
 {
-    al_destroy_bitmap(spritesheet);
 }
 
 Bullets *Enemies::shoot()
@@ -84,5 +82,5 @@ void Enemies::changeMove()
 
 void Enemies::draw()
 {
-    al_draw_bitmap_region(spritesheet, 64 * anim, 0, 64, 64, x, y, 0);
+    al_draw_bitmap_region(spritesheet, 64 * anim, 320 - 64*type, 64, 64, x, y, 0);
 };

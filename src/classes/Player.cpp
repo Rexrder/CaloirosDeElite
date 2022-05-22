@@ -6,12 +6,11 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
-Player::Player(int pl_type, int max_l)
+Player::Player(int pl_type, int max_l, ALLEGRO_BITMAP* &spr)
 {
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     type = pl_type;
-    al_set_path_filename(path, pl_skins[type].c_str());
-    spritesheet = al_load_bitmap(al_path_cstr(path, '/'));
+    spritesheet = spr;
 
     path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_set_path_filename(path, "/res/life.png");
@@ -41,7 +40,6 @@ Player::Player(int pl_type, int max_l)
 
 Player::~Player()
 {
-    al_destroy_bitmap(spritesheet);
     al_destroy_sample(sounds.hit);
     al_destroy_sample(sounds.dead);
 }
@@ -212,7 +210,7 @@ void Player::win()
 void Player::draw()
 {
     int design_lives = (lives < last_lives) ? lives : last_lives;
-    al_draw_bitmap_region(spritesheet, 64 * anim, 0, 64, 64, x, y, 0);
+    al_draw_bitmap_region(spritesheet, 64 * anim, 320 - 64*type, 64, 64, x, y, 0);
     for (int i = 1; i <= design_lives; i++)
     {
         al_draw_bitmap_region(spritesheet_life, 64 * lif_anim, 0, 64, 64, 0, HEIGHT - (i * 64), 0);

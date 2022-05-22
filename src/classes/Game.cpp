@@ -17,6 +17,9 @@ Game::Game()
     ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_set_path_filename(path, "/res/font.ttf");
     font = al_load_font(al_path_cstr(path, '/'), 25, 0);
+    path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_set_path_filename(path, "/res/skins.png");
+    spr_skins = al_load_bitmap(al_path_cstr(path, '/'));
 }
 
 void Game::restart(int mod, int pl_type, int lev, int slot, std::string player_n)
@@ -65,7 +68,7 @@ void Game::restart(int mod, int pl_type, int lev, int slot, std::string player_n
         enemies_killed[i] = 0;
     }
 
-    player = new Player(pl_type, max_lifes);
+    player = new Player(pl_type, max_lifes,spr_skins);
     score_buffs[0] = std::ceil(difficulty * 2500);
     score_buffs[1] = std::ceil(difficulty * 10000);
     bulletsEnemies.clear();
@@ -73,6 +76,7 @@ void Game::restart(int mod, int pl_type, int lev, int slot, std::string player_n
     enemiesAvailable.clear();
     bossesAvailable.clear();
     bonusEntities.clear();
+    std::cout << level;
 }
 
 Game::~Game()
@@ -104,8 +108,6 @@ void Game::createEnemies(int x_n, int y_n)
         }
     }
 
-    counter_wave = (bossesAvailable.size() == 0 || (bossesAvailable.size() == 1 && mega_boss)) ? counter_wave + 1 : 0;
-
     if (mode == 0)
     {
         if (rand() % 20 == 0)
@@ -122,39 +124,24 @@ void Game::createEnemies(int x_n, int y_n)
             bossesAvailable.push_back(new Bosses(rand() % 3, difficulty));
         }
     }
-    else if (bossesAvailable.size() <= 2)
+    else if (bossesAvailable.size() <= 2 && enemy_it < 3)
     {
-        switch (level)
+        if (level == 2)
         {
-        case 0:
-            if (counter_wave >= 3)
-            {
-                bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
-                enemy_it++;
-            }
-            break;
-        case 1:
-            if (counter_wave >= 2)
-            {
-                bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
-                enemy_it++;
-            }
-            break;
-        case 2:
             if (wave == 1)
             {
                 bossesAvailable.push_back(new Bosses(2, difficulty, true));
             }
-            if (counter_wave >= 2)
+            if (wave % 2 == 0)
             {
                 bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
                 enemy_it = (enemy_it == 0) ? 1 : 0;
             }
-            break;
         }
-        if (enemy_it > 2)
+        else
         {
-            enemy_it = 0;
+            bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
+            enemy_it++;
         }
     }
 
@@ -171,7 +158,7 @@ void Game::createEnemies(int x_n, int y_n)
             {
                 enemy_app = ((rand_val % 5) + 1 != player->getType()) ? (rand_val % 5) + 1 : 0;
             }
-            enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty));
+            enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty,spr_skins));
         }
     }
 }
@@ -440,7 +427,7 @@ bool Game::moveEntities()
     {
         if (player->getState().erase && victory && level != 2)
         {
-            restart(mode, player->getType(), level++);
+            restart(mode, player->getType(), level + 1);
         }
     }
 
@@ -544,18 +531,47 @@ void Game::playerMovement(ALLEGRO_EVENT event)
 
 void Game::saveLoad()
 {
+    int stats[7];
+    int i = 0;
     std::string line;
     std::ifstream stats_i((".\\stats.txt"));
     if (stats_i.is_open())
     {
-        stats_i.close();
+        while (std::getline(stats_i, line))
+        {
+            switch (i)
+            {
+            case 4:
+                if(!victory){
+                    stats[i] = (line.empty()) ? 1 : (1 + std::stoi(line));
+                }
+                break;
+            case 5:
+                if(victory){
+                    stats[i] = (line.empty()) ? 1 : (1 + std::stoi(line));
+                }
+                break;
+            case 6:
+                if(victory && mode == 4){
+                    stats[i] = (line.empty()) ? 1 : (1 + std::stoi(line));
+                }
+                break;
+
+            default:
+                stats[i] = (line.empty()) ? enemies_killed[i] : (enemies_killed[i] + std::stoi(line));
+                break;
+            }
+            i++;
+        }
     }
 
     std::ofstream stats_o((".\\stats.txt"));
     if (stats_o.is_open())
     {
-        stats_o << "This is a line.\n";
-        stats_o << "This is another line.\n";
+        for (auto &n : stats)
+        {
+            stats_o << std::to_string(n).c_str() << "\n";  
+        }
         stats_o.close();
     }
 
@@ -600,10 +616,10 @@ void Game::saveLoad()
             highscores_o.close();
         }
     }
-    else if (mode != 4)
+    else
     {
         std::string slots[3];
-        int i = 0;
+        i = 0;
         std::ifstream save_i((".\\save.txt"));
         if (save_i.is_open())
         {
@@ -612,13 +628,20 @@ void Game::saveLoad()
                 slots[i] = line;
                 i++;
             }
-            std::cout << "open \n";
             save_i.close();
         }
+
         std::ofstream save_o((".\\save.txt"));
         if (save_o.is_open())
         {
-            slots[slot] = (victory) ? std::to_string(mode) + " " + std::to_string(level + 1) : std::to_string(mode) + " " + std::to_string(level);
+            if (mode == 4)
+            {
+                slots[slot] = "";
+            }
+            else
+            {
+                slots[slot] = (victory) ? std::to_string(mode) + " " + std::to_string(level + 1) : std::to_string(mode) + " " + std::to_string(level);
+            }
             for (auto &n : slots)
             {
                 save_o << n.c_str() << "\n";
