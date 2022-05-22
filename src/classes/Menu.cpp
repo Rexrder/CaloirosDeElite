@@ -20,8 +20,8 @@ Menu::Menu()
     spr_troph = al_load_bitmap(al_path_cstr(path, '/'));
 
     path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-    al_set_path_filename(path, "/res/skins.png");
-    spr_troph = al_load_bitmap(al_path_cstr(path, '/'));
+    al_set_path_filename(path, "/res/skinsbig.png");
+    spr_skin = al_load_bitmap(al_path_cstr(path, '/'));
 
     player_type = 0;
     player_name.clear();
@@ -63,6 +63,12 @@ bool Menu::setstate(ALLEGRO_EVENT event, Game &game, bool &end)
                     {
                         game.restart(0, player_type, 0, slot, player_name);
                         play = true;
+                    }
+                    break;
+                case 9:
+                    if (unlock_sk[opt[1] - 21])
+                    {
+                        player_type =  opt[1] - 21;
                     }
                     break;
 
@@ -200,7 +206,7 @@ void Menu::restart()
         switch (i)
         {
         case 0:
-            unlock_t[i] = (stats[5] > 1) ? true : false;
+            unlock_t[i] = (stats[5] > 0) ? true : false;
             break;
 
         case 2:
@@ -208,20 +214,19 @@ void Menu::restart()
             break;
 
         case 3:
-            unlock_t[i] = (stats[6] > 1) ? true : false;
+            unlock_t[i] = (stats[6] > 0) ? true : false;
             break;
 
         default:
-            unlock_t[i] = (stats[1] > 1) ? true : false;
+            unlock_t[i] = (stats[i] > 0) ? true : false;
             break;
         }
     }
 
     for (size_t i = 0; i < 6; i++)
     {
-        unlock_sk[i] = (stats[5] > 5*(std::pow(2,i)-5)) ? true : false;
+        unlock_sk[i] = (stats[4] > 5 * (std::pow(2, i))-5) ? true : false;
     }
-    
 }
 
 void Menu::draw()
@@ -250,17 +255,30 @@ void Menu::draw()
         al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 + 40, ALLEGRO_ALIGN_CENTER, "CHRISTIAN LEONARD & AFONSO GOMES");
         break;
     case 3:
-        for (size_t i = 0; i < 6; i++)
+        for (size_t i = 0; i < 4; i++)
         {
             if (unlock_t[i])
             {
-                al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 - 120 + 80*i, ALLEGRO_ALIGN_LEFT, trophies[i].c_str());
-                al_draw_bitmap_region(spr_troph,384*i+anim*64,0,64,64,30,HEIGHT / 2 - 120 + 80*i,0);
-            }else{
-                al_draw_bitmap_region(spr_troph,384*i+anim*64 + 192,0,64,64,30,HEIGHT / 2 - 120 + 80*i,0);
+                al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 - 167 + 178 * i - 39, ALLEGRO_ALIGN_LEFT, trophies[i].c_str());
+                al_draw_bitmap_region(spr_troph, 768 * i + anim * 128, 0, 128, 128, 150, HEIGHT / 2 - 167 + 178 * i - 89, 0);
+            }
+            else
+            {
+                al_draw_bitmap_region(spr_troph, 768 * i + anim * 128 + 384, 0, 128, 128, 150, HEIGHT / 2 - 167 + 178 * i - 89, 0);
             }
         }
-        
+        break;
+    case 9:
+        if (unlock_sk[opt[1] - 21])
+        {
+            al_draw_bitmap_region(spr_skin, 128 * anim, 640 - 128 * (opt[1] - 21), 128, 128, WIDTH / 2 - 64, HEIGHT / 2 - 64, 0);
+        }
+        else
+        {
+            al_draw_bitmap_region(spr_skin, 128 * anim + 1024, 640 - 128 * (opt[1] - 21), 128, 128, WIDTH / 2 - 64, HEIGHT / 2 - 64, 0);
+        }
+        al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH / 2, HEIGHT / 2 + 300, ALLEGRO_ALIGN_CENTER, options[opt[1]].c_str());
+        break;
     default:
         for (int i = selects[opt[0]][0]; i <= selects[opt[0]][1]; i++)
         {
@@ -280,7 +298,7 @@ void Menu::draw()
 
 void Menu::animate()
 {
-    animation(0, 1, anim, anim_mov, true);
+    animation(0, 2, anim, anim_mov, true);
 }
 
 Menu::~Menu()
