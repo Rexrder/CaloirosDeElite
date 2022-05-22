@@ -582,12 +582,12 @@ void Game::saveLoad()
         HighscrStat play_hscr;
 
         std::ifstream highscores_i((".\\highscores.txt"));
+        play_hscr.player = player_name;
+        play_hscr.score = score;
+        highsc_list.push_back(play_hscr);
 
         if (highscores_i.is_open())
         {
-            play_hscr.player = player_name;
-            play_hscr.score = score;
-            highsc_list.push_back(play_hscr);
 
             while (std::getline(highscores_i, line))
             {
