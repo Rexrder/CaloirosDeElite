@@ -12,7 +12,7 @@
 
 int main()
 {
-    //FreeConsole(); // Avoid console apearance on execution
+    FreeConsole(); // Avoid console apearance on execution
     bool end = false;
     bool playing = false;
 

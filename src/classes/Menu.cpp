@@ -225,7 +225,7 @@ void Menu::restart()
 
     for (size_t i = 0; i < 6; i++)
     {
-        unlock_sk[i] = (stats[4] > 5 * (std::pow(2, i))-5) ? true : false;
+        unlock_sk[i] = (stats[4] >= 5 * (std::pow(2, i))-5) ? true : false;
     }
 }
 

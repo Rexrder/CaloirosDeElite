@@ -531,7 +531,7 @@ void Game::playerMovement(ALLEGRO_EVENT event)
 
 void Game::saveLoad()
 {
-    int stats[7];
+    int stats[7] = {0,0,0,0,0,0,0};
     int i = 0;
     std::string line;
     std::ifstream stats_i((".\\stats.txt"));
