@@ -62,13 +62,14 @@ void Game::restart(int mod, int pl_type, int lev, int slot, std::string player_n
     wave = 0;
     counter_wave = 5;
     enemy_it = 0;
+    enemy_it = (enemy_it == level) ? 1 : enemy_it;
     player_name = player_n;
     for (int i = 0; i <= 3; i++)
     {
         enemies_killed[i] = 0;
     }
 
-    player = new Player(pl_type, max_lifes,spr_skins);
+    player = new Player(pl_type, max_lifes, spr_skins);
     score_buffs[0] = std::ceil(difficulty * 2500);
     score_buffs[1] = std::ceil(difficulty * 10000);
     bulletsEnemies.clear();
@@ -89,6 +90,11 @@ void Game::drawUI()
     {
         std::string score_str = "SCORE: " + std::to_string(score);
         al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH, 25, ALLEGRO_ALIGN_RIGHT, score_str.c_str());
+    }
+    else
+    {
+        std::string level_str = "LEVEL " + std::to_string(level + 1);
+        al_draw_text(font, al_map_rgb(255, 255, 255), WIDTH, 25, ALLEGRO_ALIGN_RIGHT, level_str.c_str());
     }
 };
 
@@ -124,24 +130,29 @@ void Game::createEnemies(int x_n, int y_n)
             bossesAvailable.push_back(new Bosses(rand() % 3, difficulty));
         }
     }
-    else if (bossesAvailable.size() <= 2 && enemy_it < 3)
+    else if (bossesAvailable.size() <= 2)
     {
-        if (level == 2)
+        if (wave == 1)
         {
-            if (wave == 1)
-            {
-                bossesAvailable.push_back(new Bosses(2, difficulty, true));
-            }
-            if (wave % 2 == 0)
-            {
-                bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
-                enemy_it = (enemy_it == 0) ? 1 : 0;
-            }
+            bossesAvailable.push_back(new Bosses(level, difficulty + level, true));
         }
-        else
+        if (wave % 2 == 0)
         {
             bossesAvailable.push_back(new Bosses(enemy_it, difficulty + level));
-            enemy_it++;
+            switch (level)
+            {
+            case 0:
+                enemy_it = (enemy_it == 1) ? 2 : 1;
+                break;
+
+            case 1:
+                enemy_it = (enemy_it == 1) ? 2 : 1;
+                break;
+
+            default:
+                enemy_it = (enemy_it == 0) ? 1 : 0;
+                break;
+            }
         }
     }
 
@@ -158,7 +169,7 @@ void Game::createEnemies(int x_n, int y_n)
             {
                 enemy_app = ((rand_val % 5) + 1 != player->getType()) ? (rand_val % 5) + 1 : 0;
             }
-            enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty,spr_skins));
+            enemiesAvailable.push_back(new Enemies(74 * i, -64 - 74 * j, enemy_app, difficulty, spr_skins));
         }
     }
 }
@@ -384,21 +395,15 @@ bool Game::moveEntities()
         if ((*n_bosses)->getState().erase)
         {
             if (!(*n_bosses)->isMegaboss())
-            {
+            {                
                 score += std::ceil(1000 * difficulty);
                 enemies_killed[2]++;
             }
             else
             {
+                victory = (mode != 0) ? true : victory;
                 score += std::ceil(10000 * difficulty);
                 enemies_killed[3]++;
-            }
-            if (mode != 0)
-            {
-                if ((*n_bosses)->getType() == 2)
-                {
-                    victory = true;
-                }
             }
             player->buff((*n_bosses)->getType());
             delete (*n_bosses);
@@ -435,6 +440,7 @@ bool Game::moveEntities()
     {
         player->move();
     }
+
     if (player->getState().erase && (!victory || level == 2))
     {
         end = true;
@@ -531,7 +537,7 @@ void Game::playerMovement(ALLEGRO_EVENT event)
 
 void Game::saveLoad()
 {
-    int stats[7] = {0,0,0,0,0,0,0};
+    int stats[7] = {0, 0, 0, 0, 0, 0, 0};
     int i = 0;
     std::string line;
     std::ifstream stats_i((".\\stats.txt"));
@@ -542,17 +548,20 @@ void Game::saveLoad()
             switch (i)
             {
             case 4:
-                if(!victory){
+                if (!victory)
+                {
                     stats[i] = (line.empty()) ? 1 : (1 + std::stoi(line));
                 }
                 break;
             case 5:
-                if(victory){
+                if (victory)
+                {
                     stats[i] = (line.empty()) ? 1 : (1 + std::stoi(line));
                 }
                 break;
             case 6:
-                if(victory && mode == 4){
+                if (victory && mode == 4)
+                {
                     stats[i] = (line.empty()) ? 1 : (1 + std::stoi(line));
                 }
                 break;
@@ -570,7 +579,7 @@ void Game::saveLoad()
     {
         for (auto &n : stats)
         {
-            stats_o << std::to_string(n).c_str() << "\n";  
+            stats_o << std::to_string(n).c_str() << "\n";
         }
         stats_o.close();
     }
@@ -640,7 +649,7 @@ void Game::saveLoad()
             }
             else
             {
-                slots[slot] =  std::to_string(mode) + " " + std::to_string(level);
+                slots[slot] = std::to_string(mode) + " " + std::to_string(level);
             }
             for (auto &n : slots)
             {
